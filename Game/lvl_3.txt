@@ -10,7 +10,7 @@ xxxxooooxxxxooooxxxx
 xxxxooooooooooooxxxx
 xxxxooooxxxxooooxxxx
 xxxxooooxxxxooooxxxx
-xoooooooooooooooooox
+xoeoooooooooooooooox
 xoooooooooooooeoooox
 xoooooooooooooooooox
 xoooooooooooooooooox
@@ -24,7 +24,8 @@ xoooooooooooooooooox
 xxxxxxxxxxxxxxxxxxxx
 PLAYER
 MAXHP 2
-ENEMIES 3
+ENEMIES 4
+TYPE 4
 TYPE 3
 TYPE 2
 TYPE 1

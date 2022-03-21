@@ -19,7 +19,6 @@ bool Enemy::addMove(const std::vector<std::vector<bool>>& lvl, std::pair<int, in
 		return addMove(static_cast<MDIR>(rand() % 4), lvl);
 	}
 	break;
-	
 	case ETYPE::TWO:
 	{
 		if (isReadyToMove())
@@ -131,6 +130,7 @@ bool Enemy::addMove(const std::vector<std::vector<bool>>& lvl, std::pair<int, in
 	}
 	break;
 	case ETYPE::THREE:
+	case ETYPE::FOUR:
 	{
 		if (isReadyToMove())
 			return false;
@@ -279,6 +279,17 @@ void Enemy::draw() const noexcept
 		}
 		glEnd();
 		break;
+	case ETYPE::FOUR:
+		glColor3f(0.55, 0.55, 0.0);
+		glBegin(GL_QUADS);
+		{
+			glVertex2f(pos.x() - cellSize / 8, pos.y() + cellSize / 8);
+			glVertex2f(pos.x() + cellSize / 8, pos.y() + cellSize / 8);
+			glVertex2f(pos.x() + cellSize / 8, pos.y() - cellSize / 8);
+			glVertex2f(pos.x() - cellSize / 8, pos.y() - cellSize / 8);
+		}
+		glEnd();
+		break;
 	default:
 		break;
 	}
@@ -295,6 +306,7 @@ void Enemy::move() noexcept
 	case ETYPE::ONE:
 	case ETYPE::TWO:
 	case ETYPE::THREE:
+	case ETYPE::FOUR:
 	{
 		switch (dirQ.front().second)
 		{
@@ -327,6 +339,11 @@ void Enemy::move() noexcept
 
 	}
 	break;*/
+	/*case ETYPE::FOUR:
+	{
+		
+	}*/
+	break;
 	default:
 		break;
 	}

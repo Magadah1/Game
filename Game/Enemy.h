@@ -8,7 +8,8 @@ public:
 	{
 		ONE = 1,
 		TWO,
-		THREE
+		THREE,
+		FOUR
 	} ETYPE;
 
 	Enemy(QPoint pos, int cellSize, ETYPE type = ETYPE::ONE) noexcept;
