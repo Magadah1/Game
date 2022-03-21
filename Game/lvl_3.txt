@@ -1,0 +1,30 @@
+NEW 1
+TIME 300
+SIZE 20 20
+FIELD
+xxxxxxxxxxxxxxxxxxxx
+xoooooooooooooooooox
+xvvvvooooeeoooovvvvx
+xxxxooooxxxxooooxxxx
+xxxxooooxxxxooooxxxx
+xxxxooooooooooooxxxx
+xxxxooooxxxxooooxxxx
+xxxxooooxxxxooooxxxx
+xoooooooooooooooooox
+xoooooooooooooeoooox
+xoooooooooooooooooox
+xoooooooooooooooooox
+xooooooosoooooooooox
+xoooooooooooooooooox
+xooooooovooovovoovox
+xvvvvvvvooovvoooooox
+xoooooooooooooooooox
+xvvvvvvvvvvvvvvvvvvx
+xoooooooooooooooooox
+xxxxxxxxxxxxxxxxxxxx
+PLAYER
+MAXHP 2
+ENEMIES 3
+TYPE 3
+TYPE 2
+TYPE 1

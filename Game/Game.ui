@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GameClass</class>
+ <widget class="QWidget" name="GameClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>592</width>
+    <height>382</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Game</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QPushButton" name="cont">
+       <property name="styleSheet">
+        <string notr="true">background-color: grey;</string>
+       </property>
+       <property name="text">
+        <string>CONTINUE</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="select">
+       <property name="styleSheet">
+        <string notr="true">background-color: grey;</string>
+       </property>
+       <property name="text">
+        <string>Выбрать уровень</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="restart">
+       <property name="styleSheet">
+        <string notr="true">background-color: grey;</string>
+       </property>
+       <property name="text">
+        <string>Начать заного</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="save">
+       <property name="styleSheet">
+        <string notr="true">background-color: grey;</string>
+       </property>
+       <property name="text">
+        <string>Сохранить состояние уровня</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="exit">
+       <property name="styleSheet">
+        <string notr="true">background-color: grey;</string>
+       </property>
+       <property name="text">
+        <string>Выход</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="Game.qrc"/>
+ </resources>
+ <connections/>
+</ui>
