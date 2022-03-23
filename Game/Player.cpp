@@ -18,7 +18,8 @@ int Player::getMaxHP() const noexcept
 void Player::UpHP(int hp) noexcept
 {
 	health += hp;
-	health %= (maxHealth + 1);
+	if (health > maxHealth)
+		health = maxHealth;
 }
 
 void Player::DownHP(int hp) noexcept

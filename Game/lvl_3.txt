@@ -13,9 +13,9 @@ xxxxooooxxxxooooxxxx
 xoeoooooooooooooooox
 xoooooooooooooeoooox
 xooooxxxxxxxxxxoooox
-xoooooooooooooooooox
-xooooooosoooooooooox
-xoooooooooooooooooox
+xooooooxxxooooooooox
+xooooooxsoooooooooox
+xooooooxxxooooooooox
 xooooooovooovovoovox
 xvvvvvvvooovvoooooox
 xoooooooooooooooooox
@@ -23,7 +23,7 @@ xvvvvvvvvvvvvvvvvvvx
 xovvoooooooooooovvox
 xxxxxxxxxxxxxxxxxxxx
 PLAYER
-MAXHP 2
+MAXHP 20
 ENEMIES 4
 TYPE 4
 TYPE 3

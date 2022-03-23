@@ -15,6 +15,7 @@
 
 #include "Player.h"
 #include "Enemy.h"
+#include "Bonus.h"
 
 class Game : public QGLWidget
 {
@@ -40,6 +41,9 @@ public slots:
     void addMove();
     void addFastMove();
     void checkCollision();
+    void createBonus();
+    void freezeBonus();
+    void immunityBonus();
 
     void on_select_clicked();
     void on_cont_clicked();
@@ -68,6 +72,9 @@ private:
 
     Player* p;
     std::vector<Enemy*> enemies;
+    std::vector<Bonus*> bonuses;
+
+    void handleBonus(Bonus::BTYPE type) noexcept;
 
     QTimer* gameTimer;
     QTimer* moveEnemyTimer;
@@ -75,6 +82,9 @@ private:
     QTimer* addMoveTimer;
     QTimer* addFastMoveTimer;
     QTimer* checkCollisionTimer;
+    QTimer* createBonusTimer;
+    QTimer* freezeBonusTimer;
+    QTimer* immunityBonusTimer;
 
     static const unsigned gameTimerStep = 1000;
     static const unsigned moveEnemyTimerStep = 100;
@@ -82,6 +92,9 @@ private:
     static const unsigned addMoveTimerStep = 1000;
     static const unsigned addFastMoveTimerStep = 300;
     static const unsigned checkCollisionTimerStep = 750;
+    static const unsigned createBonusTimerStep = 15000;
+    static const unsigned freezeBonusTimerStep = 6500;
+    static const unsigned immunityBonusTimerStep = 9000;
 
     void drawPAUSE();
     void drawGAME();

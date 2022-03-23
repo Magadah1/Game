@@ -13,7 +13,8 @@ public:
 	{
 		TIME,
 		HP,
-		FREEZE
+		FREEZE,
+		IMMUNITY
 	} BTYPE;
 
 	Bonus(const std::vector<std::vector<bool>>& lvl, BTYPE type, int cellSize) noexcept;

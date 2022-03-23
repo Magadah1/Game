@@ -36,16 +36,25 @@ Game::Game(QGLWidget*parent)
     checkCollisionTimer = new QTimer();
     checkCollisionTimer->start(checkCollisionTimerStep);
     connect(checkCollisionTimer, &QTimer::timeout, this, &Game::checkCollision);
+
+    createBonusTimer = new QTimer();
+    createBonusTimer->start(createBonusTimerStep);
+    connect(createBonusTimer, &QTimer::timeout, this, &Game::createBonus);
+
+    freezeBonusTimer = new QTimer();
+    connect(freezeBonusTimer, &QTimer::timeout, this, &Game::freezeBonus);
+
+    immunityBonusTimer = new QTimer();
+    connect(immunityBonusTimer, &QTimer::timeout, this, &Game::immunityBonus);
 }
 
 Game::~Game()
 {
-    if (p)
-        delete p;
+    if (p) delete p;
 
-    for (auto&& en : enemies)
-        if (en)
-            delete en;
+    for (auto&& en : enemies) if (en) delete en;
+
+    for (auto&& bonus : bonuses) if (bonus) delete bonus;
 }
 
 void Game::on_select_clicked()
@@ -128,25 +137,25 @@ void Game::keyPressEvent(QKeyEvent* e)
         if (state == STATE::GAME)
         {
             buttonsPAUSE();
-            state = STATE::PAUSE;
             gameTimer->stop();
             moveEnemyTimer->stop();
             movePlayerTimer->stop();
             addMoveTimer->stop();
             addFastMoveTimer->stop();
             checkCollisionTimer->stop();
+            createBonusTimer->stop();
             setWindowTitle("PAUSE");
         }
         else if (state == STATE::PAUSE)
         {
             buttonsGAME();
-            state = STATE::GAME;
             gameTimer->start(gameTimerStep);
             moveEnemyTimer->start(moveEnemyTimerStep);
             movePlayerTimer->start(movePlayerTimerStep);
             addMoveTimer->start(addMoveTimerStep);
             addFastMoveTimer->start(addFastMoveTimerStep);
             checkCollisionTimer->start(checkCollisionTimerStep);
+            createBonusTimer->start(createBonusTimerStep);
             setWindowTitle("GAME");
         }
     }
@@ -172,6 +181,34 @@ void Game::keyPressEvent(QKeyEvent* e)
     }
 
     updateGL();
+}
+
+void Game::handleBonus(Bonus::BTYPE type) noexcept
+{
+    if (state != STATE::GAME)
+        return;
+
+    switch (type)
+    {
+    case Bonus::BTYPE::TIME:
+        gameTime += 25;
+        break;
+    case Bonus::BTYPE::HP:
+        p->UpHP();
+        break;
+    case Bonus::BTYPE::FREEZE:
+        addMoveTimer->stop();
+        addFastMoveTimer->stop();
+        moveEnemyTimer->stop();
+        freezeBonusTimer->start(freezeBonusTimerStep);
+        break;
+    case Bonus::BTYPE::IMMUNITY:
+        checkCollisionTimer->stop();
+        immunityBonusTimer->start(immunityBonusTimerStep);
+        break;
+    default:
+        break;
+    }
 }
 
 void Game::drawPAUSE()
@@ -217,6 +254,9 @@ void Game::drawGAME()
 
    for (auto&& en : enemies)
        en->draw();
+
+   for (auto&& bonus : bonuses)
+       bonus->draw();
 }
 
 void Game::drawMENU()
@@ -409,6 +449,8 @@ void Game::loadLVL(QString path)
             cellSize,
             (isNew ? maxhp : hp), maxhp);
 
+        for (auto&& bonus : bonuses) if (bonus) delete bonus;
+
         buttonsGAME();
         resize(h* cellSize, w* cellSize);
         resizeGL(h* cellSize, w* cellSize);
@@ -520,7 +562,7 @@ void Game::buttonsLOSE()
 }
 
 /// <summary>
-/// x - стена
+/// x, g, p, d, b, U, D, C, Q - стена
 /// e - возможная позиция спавна врага
 /// o - поле с монеткой
 /// v - просто пустое поле
@@ -530,7 +572,7 @@ void Game::buttonsLOSE()
 /// <returns></returns>
 bool Game::isValidCharacter(const char& c) const noexcept
 {
-    constexpr char valid_characters[] = { 'x', 'e', 'o', 's', 'v'};
+    constexpr char valid_characters[] = { 'x', 'g', 'p', 'd', 'b', 'U', 'D', 'C', 'Q', 'e', 'o', 's', 'v'};
 
     for (auto&& el : valid_characters)
         if (c == el) 
@@ -541,7 +583,7 @@ bool Game::isValidCharacter(const char& c) const noexcept
 
 bool Game::isWall(const char& c) const noexcept
 {
-    constexpr char walls[] = { 'x' };
+    constexpr char walls[] = { 'x', 'g', 'p', 'd', 'b', 'U', 'D', 'C', 'Q' };
 
     for (auto&& el : walls)
         if (c == el)
@@ -593,14 +635,26 @@ void Game::movePlayer()
     if (state != STATE::GAME)
         return;
 
-    if (p)
-    {
-        if (p->isReadyToMove())
-            p->move();
-        auto [x, y] = p->getIndexPos();
-        if (lvl[y][x] == 'o')
-            lvl[y][x] = 'v';
-    }
+    if (!p)
+        return;
+
+    if (p->isReadyToMove())
+        p->move();
+
+    auto [x, y] = p->getIndexPos();
+    if (lvl[y][x] == 'o')
+        lvl[y][x] = 'v';
+
+
+    for (auto && bonus : bonuses)
+        if (bonus->getIndexPos() == p->getIndexPos())
+        {
+            handleBonus(bonus->getType());
+            delete bonus;
+            bonus = nullptr;
+        }
+
+    std::erase(bonuses, nullptr);
 
     updateGL();
 }
@@ -641,4 +695,26 @@ void Game::checkCollision()
                 buttonsLOSE();
             }
         }
+}
+
+void Game::createBonus()
+{
+    if (state != STATE::GAME)
+        return;
+
+    bonuses.push_back(new Bonus(lvlMovable, static_cast<Bonus::BTYPE>(rand() % 4), cellSize));
+}
+
+void Game::freezeBonus()
+{
+    addMoveTimer->start(addMoveTimerStep);
+    addFastMoveTimer->start(addFastMoveTimerStep);
+    moveEnemyTimer->start(moveEnemyTimerStep);
+    freezeBonusTimer->stop();
+}
+
+void Game::immunityBonus()
+{
+    checkCollisionTimer->start(checkCollisionTimerStep);
+    immunityBonusTimer->stop();
 }
