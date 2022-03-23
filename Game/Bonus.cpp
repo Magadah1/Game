@@ -39,7 +39,6 @@ void Bonus::draw() const noexcept
 		}
 		glEnd();
 
-		glLineWidth(2);
 		glColor3f(0, 0, 0);
 		glBegin(GL_LINE_LOOP);
 		{
@@ -49,7 +48,6 @@ void Bonus::draw() const noexcept
 				glVertex2f(cos(a) * cellSize / 2 * 0.75 + pos.x(), pos.y() + sin(a) * cellSize / 2 * 0.75);
 			}
 		}
-		glLineWidth(1);
 
 		glBegin(GL_LINES);
 		{

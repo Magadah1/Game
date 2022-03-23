@@ -74,7 +74,7 @@ bool Player::addMove(MDIR dir, const std::vector<std::vector<bool>>& lvl) noexce
 	if (iy >= lvl.size() || ix >= lvl[0].size() || ix < 0 || iy < 0)
 		return false;
 
-	if (lvl[iy][ix] && dirQ.size() < 1)
+	if (lvl[iy][ix] && dirQ.size() < 2)
 	{
 		dirQ.push({ 0, dir });
 		nextPos = QPoint(x, y);

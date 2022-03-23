@@ -28,8 +28,7 @@ bool Enemy::addMove(const std::vector<std::vector<bool>>& lvl, std::pair<int, in
 			return false;
 
 		std::vector<std::vector<bool>> reversedLvl = lvl;
-		for (auto&& l : reversedLvl)
-			std::reverse(l.begin(), l.end());
+		//for (auto&& l : reversedLvl) std::reverse(l.begin(), l.end());
 		std::pair<int, int> revPpos = { pPos.second, pPos.first };
 		std::pair<int, int> revMpos = { getIndexPos().second, getIndexPos().first };
 		//std::reverse(reversedLvl.begin(), reversedLvl.end());
@@ -123,9 +122,6 @@ bool Enemy::addMove(const std::vector<std::vector<bool>>& lvl, std::pair<int, in
 		for (auto&& Move : Way)
 			retValue |= addMove(Move, lvl);
 
-		//
-		int test = dirQ.size();
-
 		return retValue;
 	}
 	break;
@@ -139,8 +135,7 @@ bool Enemy::addMove(const std::vector<std::vector<bool>>& lvl, std::pair<int, in
 			return false;
 		
 		std::vector<std::vector<bool>> reversedLvl = lvl;
-		for (auto&& l : reversedLvl)
-			std::reverse(l.begin(), l.end());
+		//for (auto&& l : reversedLvl) std::reverse(l.begin(), l.end());
 		std::pair<int, int> revPpos = { pPos.second, pPos.first };
 		std::pair<int, int> revMpos = { getIndexPos().second, getIndexPos().first };
 		//std::reverse(reversedLvl.begin(), reversedLvl.end());
@@ -223,10 +218,17 @@ bool Enemy::addMove(const std::vector<std::vector<bool>>& lvl, std::pair<int, in
 
 		}
 
-		if (Way.size())
+		bool retValue = false;
+
+		for (auto&& Move : Way)
+			retValue |= addMove(Move, lvl);
+
+		return retValue;
+
+		/*if (Way.size())
 			return addMove(Way[0], lvl);
 		else
-			return false;
+			return false;*/
 	}
 	break;
 	default:
@@ -369,8 +371,13 @@ void Enemy::move() noexcept
 		}
 		++dirQ.front().first;
 
-		if (dirQ.front().first >= 5)
-			dirQ.pop();
+		if (dirQ.front().first >= 10)
+			/*dirQ.pop();*/
+		{
+			std::queue<std::pair<int, MDIR>> empty;
+			dirQ.swap(empty);
+			nextPos = pos;
+		}
 	}
 	break;
 	default:

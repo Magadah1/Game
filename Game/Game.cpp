@@ -249,6 +249,16 @@ void Game::drawGAME()
                glVertex2f(j * cellSize, (i + 1) * cellSize);
            }
            glEnd();
+
+           glColor3f(0, 0, 0);
+           glBegin(GL_LINE_LOOP);
+           {
+               glVertex2f(j * cellSize, i * cellSize);
+               glVertex2f((j + 1) * cellSize, i * cellSize);
+               glVertex2f((j + 1) * cellSize, (i + 1) * cellSize);
+               glVertex2f(j * cellSize, (i + 1) * cellSize);
+           }
+           glEnd();
        }
 
    p->draw();
@@ -679,6 +689,8 @@ void Game::addFastMove()
     for (auto&& en : enemies)
         if (en->getType() == Enemy::ETYPE::ONE || en->getType() == Enemy::ETYPE::FOUR)
             en->addMove(lvlMovable, p->getIndexPos());
+   /*     else if (en->getType() == Enemy::ETYPE::FOUR && !en->isReadyToMove())
+            en->addMove(lvlMovable, p->getIndexPos());*/
 }
 
 void Game::checkCollision()
