@@ -616,6 +616,8 @@ void Game::gameStep()
         // test
         setWindowTitle("YOU WON!");
     }
+
+    setWindowTitle(QString("GAME IS ONLINE. HP = {%0}. TIME = {%1}").arg(p->getHP()).arg(gameTime));
 }
 
 void Game::moveEnemy()
