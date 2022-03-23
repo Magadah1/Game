@@ -12,7 +12,7 @@ xxxxooooxxxxooooxxxx
 xxxxooooxxxxooooxxxx
 xoeoooooooooooooooox
 xoooooooooooooeoooox
-xoooooooooooooooooox
+xooooxxxxxxxxxxoooox
 xoooooooooooooooooox
 xooooooosoooooooooox
 xoooooooooooooooooox
@@ -20,7 +20,7 @@ xooooooovooovovoovox
 xvvvvvvvooovvoooooox
 xoooooooooooooooooox
 xvvvvvvvvvvvvvvvvvvx
-xoooooooooooooooooox
+xovvoooooooooooovvox
 xxxxxxxxxxxxxxxxxxxx
 PLAYER
 MAXHP 2

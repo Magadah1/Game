@@ -21,7 +21,7 @@ class Game : public QGLWidget
     Q_OBJECT
 
 public:
-    Game(QGLWidget*parent = Q_NULLPTR);
+    Game(QGLWidget* parent = Q_NULLPTR);
     ~Game();
 
     enum class STATE
@@ -35,8 +35,11 @@ public:
 
 public slots:
     void gameStep();
-    void moveStep();
+    void moveEnemy();
+    void movePlayer();
     void addMove();
+    void addFastMove();
+    void checkCollision();
 
     void on_select_clicked();
     void on_cont_clicked();
@@ -67,9 +70,18 @@ private:
     std::vector<Enemy*> enemies;
 
     QTimer* gameTimer;
-    QTimer* moveTimer;
+    QTimer* moveEnemyTimer;
+    QTimer* movePlayerTimer;
     QTimer* addMoveTimer;
+    QTimer* addFastMoveTimer;
+    QTimer* checkCollisionTimer;
 
+    static const unsigned gameTimerStep = 1000;
+    static const unsigned moveEnemyTimerStep = 100;
+    static const unsigned movePlayerTimerStep = 50;
+    static const unsigned addMoveTimerStep = 1000;
+    static const unsigned addFastMoveTimerStep = 300;
+    static const unsigned checkCollisionTimerStep = 750;
 
     void drawPAUSE();
     void drawGAME();

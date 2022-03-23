@@ -305,7 +305,6 @@ void Enemy::move() noexcept
 	{
 	case ETYPE::ONE:
 	case ETYPE::TWO:
-	case ETYPE::FOUR:
 	{
 		switch (dirQ.front().second)
 		{
@@ -356,10 +355,32 @@ void Enemy::move() noexcept
 			dirQ.pop();
 	}
 	break;
-	/*case ETYPE::FOUR:
+	case ETYPE::FOUR:
 	{
-		
-	}*/
+		switch (dirQ.front().second)
+		{
+		case MDIR::UP:
+			pos.ry() += cellSize / 10;
+			break;
+		case MDIR::RIGHT:
+			pos.rx() += cellSize / 10;
+			break;
+		case MDIR::DOWN:
+			pos.ry() -= cellSize / 10;
+			break;
+		case MDIR::LEFT:
+			pos.rx() -= cellSize / 10;
+			break;
+		}
+		++dirQ.front().first;
+
+		if (dirQ.front().first >= 10)
+		{
+			std::queue<std::pair<int, MDIR>> empty;
+			dirQ.swap(empty);
+			nextPos = pos;
+		}
+	}
 	break;
 	default:
 		break;

@@ -14,16 +14,28 @@ Game::Game(QGLWidget*parent)
     loadLVL("lvl_3.txt");
 
     gameTimer = new QTimer();
-    gameTimer->start(1000);
+    gameTimer->start(gameTimerStep);
     connect(gameTimer, &QTimer::timeout, this, &Game::gameStep);
 
-    moveTimer = new QTimer();
-    moveTimer->start(50);
-    connect(moveTimer, &QTimer::timeout, this, &Game::moveStep);
+    moveEnemyTimer = new QTimer();
+    moveEnemyTimer->start(moveEnemyTimerStep);
+    connect(moveEnemyTimer, &QTimer::timeout, this, &Game::moveEnemy);
+
+    movePlayerTimer = new QTimer();
+    movePlayerTimer->start(movePlayerTimerStep);
+    connect(movePlayerTimer, &QTimer::timeout, this, &Game::movePlayer);
 
     addMoveTimer = new QTimer();
-    addMoveTimer->start(1500);
+    addMoveTimer->start(addMoveTimerStep);
     connect(addMoveTimer, &QTimer::timeout, this, &Game::addMove);
+
+    addFastMoveTimer = new QTimer();
+    addFastMoveTimer->start(addFastMoveTimerStep);
+    connect(addFastMoveTimer, &QTimer::timeout, this, &Game::addFastMove);
+
+    checkCollisionTimer = new QTimer();
+    checkCollisionTimer->start(checkCollisionTimerStep);
+    connect(checkCollisionTimer, &QTimer::timeout, this, &Game::checkCollision);
 }
 
 Game::~Game()
@@ -118,17 +130,23 @@ void Game::keyPressEvent(QKeyEvent* e)
             buttonsPAUSE();
             state = STATE::PAUSE;
             gameTimer->stop();
-            moveTimer->stop();
+            moveEnemyTimer->stop();
+            movePlayerTimer->stop();
             addMoveTimer->stop();
+            addFastMoveTimer->stop();
+            checkCollisionTimer->stop();
             setWindowTitle("PAUSE");
         }
         else if (state == STATE::PAUSE)
         {
             buttonsGAME();
             state = STATE::GAME;
-            gameTimer->start(1000);
-            moveTimer->start(50);
-            addMoveTimer->start(1500);
+            gameTimer->start(gameTimerStep);
+            moveEnemyTimer->start(moveEnemyTimerStep);
+            movePlayerTimer->start(movePlayerTimerStep);
+            addMoveTimer->start(addMoveTimerStep);
+            addFastMoveTimer->start(addFastMoveTimerStep);
+            checkCollisionTimer->start(checkCollisionTimerStep);
             setWindowTitle("GAME");
         }
     }
@@ -218,7 +236,7 @@ void Game::drawMENU()
 void Game::drawLOSE()
 {
     // test
-    setWindowTitle("YOU LOSE!");
+    setWindowTitle(QString("YOU LOSER! HP = {%0} | TIME = {%1}").arg(p->getHP()).arg(gameTime));
 
     glColor3f(1, 0, 0);
     glBegin(GL_LINES);
@@ -537,10 +555,6 @@ void Game::gameStep()
     if (state != STATE::GAME)
         return;
 
-    for (auto&& en : enemies)
-        if (en->getType() == Enemy::ETYPE::ONE)
-            en->addMove(lvlMovable, p->getIndexPos());
-
     gameTime -= 1;
     if (gameTime <= 0)
     {
@@ -562,7 +576,19 @@ void Game::gameStep()
     }
 }
 
-void Game::moveStep()
+void Game::moveEnemy()
+{
+    if (state != STATE::GAME)
+        return;
+
+    for (auto&& en : enemies)
+        if (en->isReadyToMove())
+            en->move();
+
+    updateGL();
+}
+
+void Game::movePlayer()
 {
     if (state != STATE::GAME)
         return;
@@ -576,10 +602,6 @@ void Game::moveStep()
             lvl[y][x] = 'v';
     }
 
-    for (auto&& en : enemies)
-        if (en->isReadyToMove())
-            en->move();
-
     updateGL();
 }
 
@@ -590,11 +612,27 @@ void Game::addMove()
 
     for (auto&& en : enemies)
     {
-        /*if (en->getType() == Enemy::ETYPE::THREE)
-            en->resetMoves();*/
-        if (en->getType() != Enemy::ETYPE::ONE)
+        if (en->getType() != Enemy::ETYPE::ONE && en->getType() != Enemy::ETYPE::FOUR)
             en->addMove(lvlMovable, p->getIndexPos());
-        
+    }
+}
+
+void Game::addFastMove()
+{
+    if (state != STATE::GAME)
+        return;
+
+    for (auto&& en : enemies)
+        if (en->getType() == Enemy::ETYPE::ONE || en->getType() == Enemy::ETYPE::FOUR)
+            en->addMove(lvlMovable, p->getIndexPos());
+}
+
+void Game::checkCollision()
+{
+    if (state != STATE::GAME)
+        return;
+
+    for (auto&& en : enemies)
         if (en->getIndexPos() == p->getIndexPos())
         {
             p->DownHP();
@@ -603,5 +641,4 @@ void Game::addMove()
                 buttonsLOSE();
             }
         }
-    }
 }
