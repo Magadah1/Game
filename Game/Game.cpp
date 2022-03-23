@@ -226,6 +226,7 @@ void Game::drawPAUSE()
 
 void Game::drawGAME()
 {
+   // test
    for (size_t i = 0; i < lvl.size(); ++i)
        for (size_t j = 0; j < lvl[i].size(); ++j)
        {
@@ -331,7 +332,6 @@ void Game::loadLVL(QString path)
         if (tempW != "FIELD")
             throw std::exception("Did not find field \'FIELD\'!");
 
-        coinCount = 0;
         lvl.clear();
         lvlMovable.clear();
         spawnPoints.clear();
@@ -353,8 +353,6 @@ void Game::loadLVL(QString path)
                         spawnPoints.push_back({ w - i - 1, j });
                     if (c == 'e')
                         enSpawnPoints.push_back({ w - i - 1, j });
-                    if (c == 'o')
-                        ++coinCount;
 
                     if (isWall(c))
                         lvlMovable[i][j] = false;

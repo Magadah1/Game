@@ -223,15 +223,10 @@ bool Enemy::addMove(const std::vector<std::vector<bool>>& lvl, std::pair<int, in
 
 		}
 
-		bool retValue = false;
-
-		for (auto&& Move : Way)
-			retValue |= addMove(Move, lvl);
-
-		//
-		int test = dirQ.size();
-
-		return retValue;
+		if (Way.size())
+			return addMove(Way[0], lvl);
+		else
+			return false;
 	}
 	break;
 	default:
@@ -374,12 +369,8 @@ void Enemy::move() noexcept
 		}
 		++dirQ.front().first;
 
-		if (dirQ.front().first >= 10)
-		{
-			std::queue<std::pair<int, MDIR>> empty;
-			dirQ.swap(empty);
-			nextPos = pos;
-		}
+		if (dirQ.front().first >= 5)
+			dirQ.pop();
 	}
 	break;
 	default:

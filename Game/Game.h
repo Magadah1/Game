@@ -66,7 +66,6 @@ private:
     std::vector<std::pair<size_t, size_t>> spawnPoints;
     std::vector<std::pair<size_t, size_t>> enSpawnPoints;
     int gameTime;
-    int coinCount;
 
     STATE state;
 
@@ -92,7 +91,7 @@ private:
     static const unsigned addMoveTimerStep = 1000;
     static const unsigned addFastMoveTimerStep = 300;
     static const unsigned checkCollisionTimerStep = 750;
-    static const unsigned createBonusTimerStep = 15000;
+    static const unsigned createBonusTimerStep = 1500;
     static const unsigned freezeBonusTimerStep = 6500;
     static const unsigned immunityBonusTimerStep = 9000;
 
