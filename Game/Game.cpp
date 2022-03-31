@@ -191,7 +191,7 @@ void Game::handleBonus(Bonus::BTYPE type) noexcept
     switch (type)
     {
     case Bonus::BTYPE::TIME:
-        gameTime += 25;
+        gameTime += 10;
         break;
     case Bonus::BTYPE::HP:
         p->UpHP();
