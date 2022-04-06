@@ -3,6 +3,9 @@
 Player::Player(QPoint pos, int cellSize, int health, int maxHealth) noexcept
 	: Entity(pos, cellSize), health(health), maxHealth(maxHealth)
 {
+    glGenTextures(1, &textures);
+    photo_image = auxDIBImageLoad(L"D:\\VisualStudio22\\Codes\\Game\\Game\\Hero.bmp");
+    
 }
 
 int Player::getHP() const noexcept
@@ -90,35 +93,31 @@ void Player::draw(std::pair<double, double> t0, double l) const noexcept
             }
             else
             {
+                
                 // Ëèöî Àíäðþøè
                 glRotated(180, 0, 0, 1);
                 Draw_Parallepiped(0, 0, 0, 7.999 * l, 7.999 * l, 7.999 * l, 10, 10);
-                GLuint textures;
-                glGenTextures(1, &textures);
-                glBindTexture(GL_TEXTURE_2D, textures);
-                //unsigned int photo_tex;
-                AUX_RGBImageRec* photo_image = auxDIBImageLoad(L"D:\\VisualStudio22\\Codes\\Game\\Game\\Hero.bmp");
-                glEnable(GL_TEXTURE_2D);
-                //glBindTexture(GL_TEXTURE_2D, photo_tex);
-                glBegin(GL_QUADS);
-                glColor3d(1, 1, 1);
-                glTranslated(0, 0, 4 * l);
-                glTexCoord2d(0, 0); glVertex3d(-4 * l, -4 * l, -4 * l);
-                glTexCoord2d(0, 1); glVertex3d(-4 * l, -4 * l, 4 * l);
-                glTexCoord2d(1, 1); glVertex3d(4 * l, -4 * l, 4 * l);
-                glTexCoord2d(1, 0); glVertex3d(4 * l, -4 * l, -4 * l);
-                glEnd();
-
                 glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                 glTexImage2D(GL_TEXTURE_2D, 0, 3,
                     photo_image->sizeX,
                     photo_image->sizeY,
                     0, GL_RGB, GL_UNSIGNED_BYTE,
                     photo_image->data);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glEnable(GL_TEXTURE_2D);
+                {
+                    glBindTexture(GL_TEXTURE_2D, textures);
+                    glBegin(GL_QUADS);
+                    glColor3d(1, 1, 1);
+                    glTranslated(0, 0, 4 * l);
+                    glTexCoord2d(0, 0); glVertex3d(-4 * l, -4 * l, -4 * l);
+                    glTexCoord2d(0, 1); glVertex3d(-4 * l, -4 * l, 4 * l);
+                    glTexCoord2d(1, 1); glVertex3d(4 * l, -4 * l, 4 * l);
+                    glTexCoord2d(1, 0); glVertex3d(4 * l, -4 * l, -4 * l);
+                    glEnd();
+                }
                 glDisable(GL_TEXTURE_2D);
-                glEnable(GL_DEPTH_TEST);
             }
         }
         glPopMatrix();

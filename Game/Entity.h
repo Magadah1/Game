@@ -56,4 +56,8 @@ protected:
 	mutable MDIR lastDir;
 
 	QPoint nextPos;
+
+	mutable GLuint textures;
+
+	AUX_RGBImageRec* photo_image;
 };

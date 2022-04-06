@@ -63,7 +63,7 @@ private:
 	static const unsigned checkCollisionTimerStep = 750;
 
 	QTimer* createBonusTimer;
-	static const unsigned createBonusTimerStep = 1500;
+	static const unsigned createBonusTimerStep = 15000;
 
 	QTimer* freezeBonusTimer;
 	static const unsigned freezeBonusTimerStep = 6500;

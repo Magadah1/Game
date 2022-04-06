@@ -693,6 +693,8 @@ void Game3D::gameStep()
     {
         //buttonsWIN();
 
+        state = STATE::WIN;// 
+
         // test
         setWindowTitle("YOU WON!");
     }
@@ -778,6 +780,7 @@ void Game3D::checkCollision()
             p->DownHP();
             if (!*p)
             {
+                state = STATE::LOSE; //
                 //buttonsLOSE();
             }
         }

@@ -1,7 +1,7 @@
 #include "Entity.h"
 
 Entity::Entity(QPoint pos, int cellSize) noexcept
-    : pos(pos), cellSize(cellSize), nextPos(pos), isFun(false), heroPar(0), lastDir(MDIR::UP)
+    : pos(pos), cellSize(cellSize), nextPos(pos), isFun(false), heroPar(0), lastDir(MDIR::UP), textures(0), photo_image(nullptr)
 {
 }
 

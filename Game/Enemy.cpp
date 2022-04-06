@@ -3,7 +3,8 @@
 Enemy::Enemy(QPoint pos, int cellSize, ETYPE type) noexcept
 	: Entity(pos, cellSize), type(type)
 {
-	//photo_image = auxDIBImageLoad(L"D:\\VisualStudio22\\Codes\\Game\\Game\\Z.bmp");
+	glGenTextures(1, &textures);
+	photo_image = auxDIBImageLoad(L"D:\\VisualStudio22\\Codes\\Game\\Game\\Z.bmp");
 }
 
 Enemy::ETYPE Enemy::getType() const noexcept
@@ -176,39 +177,34 @@ void Enemy::draw(std::pair<double, double> t0, double l) const noexcept
 				}
 				else
 				{
-					GLuint textures;
-					glGenTextures(1, &textures);
-					glBindTexture(GL_TEXTURE_2D, textures);
-					//unsigned int photo_tex;
-					AUX_RGBImageRec* photo_image = auxDIBImageLoad(L"D:\\VisualStudio22\\Codes\\Game\\Game\\Z.bmp");
-					glEnable(GL_TEXTURE_2D);
-					//glBindTexture(GL_TEXTURE_2D, photo_tex);
-					GLUquadricObj* quadObj;
-					quadObj = gluNewQuadric();
-					gluQuadricTexture(quadObj, GL_TRUE);
-					gluQuadricDrawStyle(quadObj, GLU_FILL);
-					glColor3d(1, 1, 1);
-					glRotated(5, 0, 1, 0);
-					glPushMatrix();
-					{
-						glTranslated(0, 0, 3.5 * l);
-						glRotated(15, 0, 0, 1);
-						glRotated(-5, 0, 1, 0);
-						gluSphere(quadObj, 4.5 * l, 16, 16);
-					}
-					glPopMatrix();
-					gluDeleteQuadric(quadObj);
-					auxSwapBuffers();
 					glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 					glTexImage2D(GL_TEXTURE_2D, 0, 3,
 						photo_image->sizeX,
 						photo_image->sizeY,
 						0, GL_RGB, GL_UNSIGNED_BYTE,
 						photo_image->data);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+					glEnable(GL_TEXTURE_2D);
+					{
+						glBindTexture(GL_TEXTURE_2D, textures);
+						GLUquadricObj* quadObj;
+						quadObj = gluNewQuadric();
+						gluQuadricTexture(quadObj, GL_TRUE);
+						gluQuadricDrawStyle(quadObj, GLU_FILL);
+						glColor3d(1, 1, 1);
+						glRotated(5, 0, 1, 0);
+						glPushMatrix();
+						{
+							glTranslated(0, 0, 3.5 * l);
+							glRotated(15, 0, 0, 1);
+							glRotated(-5, 0, 1, 0);
+							gluSphere(quadObj, 4.5 * l, 16, 16);
+						}
+						glPopMatrix();
+						gluDeleteQuadric(quadObj);
+					}
 					glDisable(GL_TEXTURE_2D);
-					glEnable(GL_DEPTH_TEST);
 				}
 			}
 			glPopMatrix();
