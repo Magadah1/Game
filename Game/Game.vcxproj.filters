@@ -55,6 +55,12 @@
     <ClCompile Include="Bonus.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Game3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Diamond.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="lvl_1.txt" />
@@ -75,9 +81,15 @@
     <ClInclude Include="Bonus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Diamond.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="MainGame.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Game3D.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

@@ -61,11 +61,12 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>D:\glut-3.7.6-bin;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Glaux;D:\glut-3.7.6-bin;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>D:\glut-3.7.6-bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies);$(Qt_LIBS_);glut32.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Glaux;D:\glut-3.7.6-bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies);$(Qt_LIBS_);glut32.lib;GLAUX.LIB;</AdditionalDependencies>
+      <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Win32'" Label="Configuration">
@@ -96,8 +97,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Bonus.cpp" />
+    <ClCompile Include="Diamond.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="Game3D.cpp" />
     <ClCompile Include="MainGame.cpp" />
     <ClCompile Include="Player.cpp" />
     <QtRcc Include="Game.qrc" />
@@ -115,9 +118,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bonus.h" />
+    <ClInclude Include="Diamond.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Entity.h" />
     <QtMoc Include="MainGame.h" />
+    <QtMoc Include="Game3D.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

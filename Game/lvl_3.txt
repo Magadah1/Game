@@ -2,26 +2,26 @@ NEW 1
 TIME 300
 SIZE 20 20
 FIELD
-xxxxxxxxxxxxxxxxxxxx
+gxxxxxxxxxxxxxxxxxxp
 xoooooooooooooooooox
 xvvvvooooeeoooovvvvx
-xxxxooooxxxxooooxxxx
-xxxxooooxxxxooooxxxx
+xxxpoooogxxpoooogxxx
+xxxxoooodxxbooooxxxx
 xxxxooooooooooooxxxx
-xxxxooooxxxxooooxxxx
-xxxxooooxxxxooooxxxx
+xxxxoooogxxpooooxxxx
+xxxboooodxxboooodxxx
 xoeoooooooooooooooox
 xoooooooooooooeoooox
-xooooxxxxxxxxxxoooox
-xooooooxxxooooooooox
-xooooooxsoooooooooox
-xooooooxxxooooooooox
+xooooCxxxxxxxxDoooox
+xooooooxxbooooooooox
+xooooooxooooooooooox
+xoooooodxDooooooooox
 xooooooovooovovoovox
 xvvvvvvvooovvoooooox
-xoooooooooooooooooox
+xoooooooooosooooooox
 xvvvvvvvvvvvvvvvvvvx
 xovvoooooooooooovvox
-xxxxxxxxxxxxxxxxxxxx
+dxxxxxxxxxxxxxxxxxxb
 PLAYER
 MAXHP 20
 ENEMIES 4

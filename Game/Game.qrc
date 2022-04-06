@@ -1,4 +1,6 @@
 <RCC>
-    <qresource prefix="Game">
+    <qresource prefix="/Game">
+        <file>Hero.bmp</file>
+        <file>Z.bmp</file>
     </qresource>
 </RCC>

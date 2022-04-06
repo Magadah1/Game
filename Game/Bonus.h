@@ -4,6 +4,7 @@
 #include <QtOpenGL>
 #include "glut.h"
 #include <vector>
+#include "Entity.h"
 
 
 class Bonus
@@ -21,7 +22,7 @@ public:
 
 	std::pair<int, int> getIndexPos() const noexcept;
 
-	void draw() const noexcept;
+	void draw(std::pair<double, double> t0, double l) const noexcept;
 
 	BTYPE getType() const noexcept;
 
@@ -31,4 +32,6 @@ private:
 	int cellSize;
 
 	BTYPE type;
+
+	mutable int heroPar;
 };

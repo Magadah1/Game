@@ -5,6 +5,7 @@ Game::Game(QGLWidget*parent)
 {
     srand(static_cast<unsigned>(time(nullptr)));
     ui.setupUi(this);
+    move(0, 0);
 
     buttonsMENU();
     state = STATE::MENU;
@@ -90,7 +91,6 @@ void Game::on_exit_clicked()
 
 void Game::initializeGL()
 {
-    move(0, 0);
 }
 
 void Game::resizeGL(int w, int h)
@@ -261,13 +261,14 @@ void Game::drawGAME()
            glEnd();
        }
 
-   p->draw();
+   // ÓÁÐÀÒÜ ÅÁÓ×ÈÉ ÊÎÌÌÅÍÒÀÐÈÉ. ÎÍ ÒÓÒ ÈÇ-ÇÀ ÏÅÐÅÕÎÄÀ Â 3D
+   /*p->draw();
 
    for (auto&& en : enemies)
        en->draw();
 
    for (auto&& bonus : bonuses)
-       bonus->draw();
+       bonus->draw();*/
 }
 
 void Game::drawMENU()
@@ -588,7 +589,6 @@ bool Game::isValidCharacter(const char& c) const noexcept
     return false;
 }
 
-
 bool Game::isWall(const char& c) const noexcept
 {
     constexpr char walls[] = { 'x', 'g', 'p', 'd', 'b', 'U', 'D', 'C', 'Q' };
@@ -598,7 +598,6 @@ bool Game::isWall(const char& c) const noexcept
             return true;
     return false;
 }
-
 
 void Game::gameStep()
 {

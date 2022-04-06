@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Entity.h"
 
 class Player :
@@ -13,7 +15,7 @@ public:
 
 	operator bool() const noexcept;
 
-	virtual void draw() const noexcept override final;
+	virtual void draw(std::pair<double, double> t0, double l) const noexcept override final;
 
 	virtual void move() noexcept override final;
 

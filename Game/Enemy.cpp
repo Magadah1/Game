@@ -3,6 +3,7 @@
 Enemy::Enemy(QPoint pos, int cellSize, ETYPE type) noexcept
 	: Entity(pos, cellSize), type(type)
 {
+	//photo_image = auxDIBImageLoad(L"D:\\VisualStudio22\\Codes\\Game\\Game\\Z.bmp");
 }
 
 Enemy::ETYPE Enemy::getType() const noexcept
@@ -121,61 +122,414 @@ bool Enemy::addMove(const std::vector<std::vector<bool>>& lvl, std::pair<int, in
 	
 }
 
-void Enemy::draw() const noexcept
+void Enemy::draw(std::pair<double, double> t0, double l) const noexcept
 {
-	// test
-	switch (type)
+	auto [x0, y0] = t0;
+	glPushMatrix();
 	{
-	case ETYPE::ONE:
-		glColor3f(0.66, 0.66, 0.66);
-		glBegin(GL_QUADS);
+		if (!dirQ.empty())
+			lastDir = dirQ.front().second;
+		
+		glTranslatef(x0 + pos.x(), y0 + pos.y(), 0);
+		switch (type)
 		{
-			glVertex2f(pos.x() - cellSize / 2, pos.y());
-			glVertex2f(pos.x(), pos.y() + cellSize / 2);
-			glVertex2f(pos.x() + cellSize / 2, pos.y());
-			glVertex2f(pos.x(), pos.y() - cellSize / 2);
-		}
-		glEnd();
-		break;
+		case ETYPE::ONE:
+		{
+			switch (lastDir)
+			{
+			case MDIR::UP:
+				glRotatef(180, 0, 0, 1);
+				break;
+			case MDIR::RIGHT:
+				glRotatef(90, 0, 0, 1);
+				break;
+			case MDIR::DOWN:
+				// 0
+				break;
+			case MDIR::LEFT:
+				glRotatef(-90, 0, 0, 1);
+				break;
+			default:
+				break;
+			}
 
-	case ETYPE::TWO:
-		glColor3f(0.45, 0.60, 0.90);
-		glBegin(GL_QUADS);
-		{
-			glVertex2f(pos.x() - cellSize / 2, pos.y());
-			glVertex2f(pos.x(), pos.y() + cellSize / 4);
-			glVertex2f(pos.x() + cellSize / 2, pos.y());
-			glVertex2f(pos.x(), pos.y() - cellSize / 4);
-		}
-		glEnd();
-		break;
+			glTranslated(0, 0, 19 * l);
+			glColor3f(66 / 255.0, 170 / 255.0, 255 / 255.0);
+			Draw_Parallepiped(0, 0, 0, 8 * l, 4 * l, 10 * l, 10, 10); // Туловище 10 по z на 8 по y, 4 по х
+			// Голова:
+			glPushMatrix();
+			{
+				glTranslated(0, 0, 5 * l);
+				glColor3f(99 / 255.0, 150 / 255.0, 83 / 255.0);
+				if (!isFun)
+				{
+					Draw_Parallepiped(0, 0, 4 * l, 8 * l, 8 * l, 8 * l, 10, 10);
+					// Глаза:
+					glColor3f(20 / 255.0, 20 / 255.0, 20 / 255.0);
+					glPushMatrix();
+					{
+						glTranslated(0, -4 * l, 4 * l);
+						Draw_Parallepiped(-2 * l, 0, 0, 2 * l, 0.01 * l, 1 * l, 2, 2);
+						Draw_Parallepiped(2 * l, 0, 0, 2 * l, 0.01 * l, 1 * l, 2, 2);
+					}
+					glPopMatrix();
+				}
+				else
+				{
+					GLuint textures;
+					glGenTextures(1, &textures);
+					glBindTexture(GL_TEXTURE_2D, textures);
+					//unsigned int photo_tex;
+					AUX_RGBImageRec* photo_image = auxDIBImageLoad(L"D:\\VisualStudio22\\Codes\\Game\\Game\\Z.bmp");
+					glEnable(GL_TEXTURE_2D);
+					//glBindTexture(GL_TEXTURE_2D, photo_tex);
+					GLUquadricObj* quadObj;
+					quadObj = gluNewQuadric();
+					gluQuadricTexture(quadObj, GL_TRUE);
+					gluQuadricDrawStyle(quadObj, GLU_FILL);
+					glColor3d(1, 1, 1);
+					glRotated(5, 0, 1, 0);
+					glPushMatrix();
+					{
+						glTranslated(0, 0, 3.5 * l);
+						glRotated(15, 0, 0, 1);
+						glRotated(-5, 0, 1, 0);
+						gluSphere(quadObj, 4.5 * l, 16, 16);
+					}
+					glPopMatrix();
+					gluDeleteQuadric(quadObj);
+					auxSwapBuffers();
+					glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+					glTexImage2D(GL_TEXTURE_2D, 0, 3,
+						photo_image->sizeX,
+						photo_image->sizeY,
+						0, GL_RGB, GL_UNSIGNED_BYTE,
+						photo_image->data);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+					glDisable(GL_TEXTURE_2D);
+					glEnable(GL_DEPTH_TEST);
+				}
+			}
+			glPopMatrix();
+			// Руки:
+			glPushMatrix();
+			{
+				glTranslated(0, 0, 5 * l);
+				// Плотная на 90 градусов) :
+				/*glRotatef(-90, 1, 0, 0);
+				glTranslated(0 * l, 2 * l, 2 * l);*/
+				glColor3f(66 / 255.0, 170 / 255.0, 255 / 255.0);
+				Draw_Parallepiped(-6 * l, 0, -2 * l, 4 * l, 4 * l, 4 * l, 2, 2);
+				Draw_Parallepiped(6 * l, 0, -2 * l, 4 * l, 4 * l, 4 * l, 2, 2);
+				glTranslated(0, 0, -4 * l);
+				glColor3f(99 / 255.0, 150 / 255.0, 83 / 255.0);
+				Draw_Parallepiped(-6 * l, 0, -4 * l, 4 * l, 4 * l, 8 * l, 2, 2);
+				Draw_Parallepiped(6 * l, 0, -4 * l, 4 * l, 4 * l, 8 * l, 2, 2);
+			}
+			glPopMatrix();
+			// Ноги:
+			glPushMatrix();
+			{
+				glTranslated(0, 0, -5 * l);
 
-	case ETYPE::THREE:
-		glColor3f(0.1, 0.9, 0.45);
-		glBegin(GL_QUADS);
-		{
-			glVertex2f(pos.x() - cellSize / 4, pos.y());
-			glVertex2f(pos.x(), pos.y() + cellSize / 4);
-			glVertex2f(pos.x() + cellSize / 4, pos.y());
-			glVertex2f(pos.x(), pos.y() - cellSize / 4);
+				glPushMatrix();
+				{
+					glRotated(-15 + abs(heroPar), 1, 0, 0);
+					glColor3f(127 / 255.0, 0 / 255.0, 255 / 255.0);
+					Draw_Parallepiped(-2 * l, 0, -6 * l, 4 * l, 4 * l, 12 * l, 5, 5);
+					glTranslated(0, 0, -12 * l);
+					glColor3f(102 / 255.0, 92 / 255.0, 85 / 255.0);
+					Draw_Parallepiped(-2 * l, 0, -1 * l, 4 * l, 4 * l, 2 * l, 2, 2);
+				}
+				glPopMatrix();
+
+				glPushMatrix();
+				{
+					glRotated(-(-15 + abs(heroPar)), 1, 0, 0);
+					glColor3f(127 / 255.0, 0 / 255.0, 255 / 255.0);
+					Draw_Parallepiped(2 * l, 0, -6 * l, 4 * l, 4 * l, 12 * l, 5, 5);
+					glTranslated(0, 0, -12 * l);
+					glColor3f(102 / 255.0, 92 / 255.0, 85 / 255.0);
+					Draw_Parallepiped(2 * l, 0, -1 * l, 4 * l, 4 * l, 2 * l, 2, 2);
+				}
+				glPopMatrix();
+			}
+			glPopMatrix();
+			if (abs(heroPar) >= 30)
+				heroPar *= -1;
+			heroPar += 3;
 		}
-		glEnd();
-		break;
-	case ETYPE::FOUR:
-		glColor3f(0.55, 0.55, 0.0);
-		glBegin(GL_QUADS);
+			break;
+
+		case ETYPE::TWO:
 		{
-			glVertex2f(pos.x() - cellSize / 8, pos.y() + cellSize / 8);
-			glVertex2f(pos.x() + cellSize / 8, pos.y() + cellSize / 8);
-			glVertex2f(pos.x() + cellSize / 8, pos.y() - cellSize / 8);
-			glVertex2f(pos.x() - cellSize / 8, pos.y() - cellSize / 8);
+			switch (lastDir)
+			{
+			case MDIR::UP:
+				glRotatef(180, 0, 0, 1);
+				break;
+			case MDIR::RIGHT:
+				glRotatef(90, 0, 0, 1);
+				break;
+			case MDIR::DOWN:
+				// 0
+				break;
+			case MDIR::LEFT:
+				glRotatef(-90, 0, 0, 1);
+				break;
+			default:
+				break;
+			}
+			
+			glTranslated(0, 0, 35 * l);
+			glColor3f(26 / 255.0, 26 / 255.0, 26 / 255.0);
+			Draw_Parallepiped(0, 0, 0, 8 * l, 5 * l, 16 * l, 10, 10); // Туловище
+			// Голова
+			glPushMatrix();
+			{
+				glTranslated(0, 0, 8 * l);
+				Draw_Parallepiped(0, 0, 0, 8 * l, 8 * l, 8 * l, 10, 10);
+				// Глаза
+				glColor3f(179 / 255.0, 102 / 255.0, 255 / 255.0);
+				glPushMatrix();
+				{
+					glTranslated(-2 * l, -4 * l, 0);
+					Draw_Parallepiped(0, 0, 0, 2 * l, 1 * l, 1 * l, 2, 2);
+					glColor3f(139 / 255.0, 0 / 255.0, 255 / 255.0);
+					Draw_Parallepiped(0, 0, 0, 1 * l, 1.001 * l, 1 * l, 2, 2);
+				}
+				glPopMatrix();
+				glColor3f(179 / 255.0, 102 / 255.0, 255 / 255.0);
+				glPushMatrix();
+				{
+					glTranslated(2 * l, -4 * l, 0);
+					Draw_Parallepiped(0, 0, 0, 2 * l, 1 * l, 1 * l, 2, 2);
+					glColor3f(139 / 255.0, 0 / 255.0, 255 / 255.0);
+					Draw_Parallepiped(0, 0, 0, 1 * l, 1.001 * l, 1 * l, 2, 2);
+				}
+				glPopMatrix();
+			}
+			glPopMatrix();
+			glColor3f(26 / 255.0, 26 / 255.0, 26 / 255.0);
+			// Руки
+			glPushMatrix();
+			{
+				glTranslated(5 * l, 0, 5 * l);
+				glRotated(-15 + abs(heroPar), 1, 0, 0);
+				Draw_Parallepiped(0, 0, -15 * l, 2 * l, 2 * l, 30 * l, 10, 10);
+			}
+			glPopMatrix();
+			glPushMatrix();
+			{
+				glTranslated(-5 * l, 0, 5 * l);
+				glRotated(-(-15 + abs(heroPar)), 1, 0, 0);
+				Draw_Parallepiped(0, 0, -15 * l, 2 * l, 2 * l, 30 * l, 10, 10);
+			}
+			glPopMatrix();
+			// Ноги
+			glPushMatrix();
+			{
+				glTranslated(2 * l, 0, -2 * l);
+				glRotated(-(-15 + abs(heroPar)), 1, 0, 0);
+				Draw_Parallepiped(0, 0, -20 * l, 2 * l, 2 * l, 30 * l, 10, 10);
+			}
+			glPopMatrix();
+			glPushMatrix();
+			{
+				glTranslated(-2 * l, 0, -2 * l);
+				glRotated(-15 + abs(heroPar), 1, 0, 0);
+				Draw_Parallepiped(0, 0, -20 * l, 2 * l, 2 * l, 30 * l, 10, 10);
+			}
+			glPopMatrix();
+			if (abs(heroPar) >= 30)
+				heroPar *= -1;
+			heroPar += 1;
 		}
-		glEnd();
-		break;
-	default:
-		break;
+			break;
+
+		case ETYPE::THREE:
+		{
+			glRotatef(180, 0, 0, 1);
+			switch (lastDir)
+			{
+			case MDIR::UP:
+				glRotatef(180, 0, 0, 1);
+				break;
+			case MDIR::RIGHT:
+				glRotatef(90, 0, 0, 1);
+				break;
+			case MDIR::DOWN:
+				// 0
+				break;
+			case MDIR::LEFT:
+				glRotatef(-90, 0, 0, 1);
+				break;
+			default:
+				break;
+			}
+			glTranslated(0, 0, 8.4 * l);
+			glColor3f(192 / 255.0, 192 / 255.0, 192 / 255.0);
+			Draw_Parallepiped(0, 0, 0, 6 * l, 15 * l, 6 * l, 5, 5); // Туловище 10 по z на 8 по y, 4 по х
+			glPushMatrix();
+			{   // Грива
+				glTranslated(0 * l, 1.5 * l, 0 * l);
+				Draw_Parallepiped(0, 3 * l, 0.5 * l, 8 * l, 6 * l, 7 * l, 5, 5);
+				// Голова
+				glTranslated(0 * l, 6 * l, 0 * l);
+				Draw_Parallepiped(0, 1.5 * l, 0, 6 * l, 3 * l, 6 * l, 5, 5);
+				glColor3f(202 / 255.0, 202 / 255.0, 202 / 255.0);
+				Draw_Parallepiped(-2 * l, 0.5 * l, 4 * l, 2 * l, 1 * l, 2 * l, 5, 5);
+				Draw_Parallepiped(2 * l, 0.5 * l, 4 * l, 2 * l, 1 * l, 2 * l, 5, 5);
+				// Глаза
+				glTranslated(0 * l, 3 * l, 0 * l);
+				glColor3f(255 / 255.0, 255 / 255.0, 255 / 255.0);
+				Draw_Parallepiped(-2 * l, 0, 0.5 * l, 2 * l, 0.01 * l, 1 * l, 5, 5);
+				Draw_Parallepiped(2 * l, 0, 0.5 * l, 2 * l, 0.01 * l, 1 * l, 5, 5);
+				glColor3f(0 / 255.0, 0 / 255.0, 0 / 255.0);
+				Draw_Parallepiped(-1.5 * l, 0, 0.5 * l, 1 * l, 0.1 * l, 1 * l, 5, 5);
+				Draw_Parallepiped(1.5 * l, 0, 0.5 * l, 1 * l, 0.1 * l, 1 * l, 5, 5);
+				glColor3f(255 / 255.0, 0 / 255.0, 0 / 255.0);
+				Draw_Parallepiped(-1.5 * l, 0, 0.5 * l, 0.5 * l, 0.2 * l, 0.5 * l, 5, 5);
+				Draw_Parallepiped(1.5 * l, 0, 0.5 * l, 0.5 * l, 0.2 * l, 0.5 * l, 5, 5);
+				glColor3f(255 / 255.0, 178 / 255.0, 102 / 255.0);
+				Draw_Parallepiped(0, 0, -1 * l, 6 * l, 0.001 * l, 4 * l, 5, 5);
+				// Нос
+				glColor3f(192 / 255.0, 192 / 255.0, 192 / 255.0);
+				Draw_Parallepiped(0, 1.5 * l, -1.5 * l, 3 * l, 3 * l, 3 * l, 5, 5);
+				glColor3f(0 / 255.0, 0 / 255.0, 0 / 255.0);
+				Draw_Parallepiped(0, 1.5 * l, -2.5 * l, 3.01 * l, 3.01 * l, 1.01 * l, 5, 5);
+				glTranslated(0 * l, 2.5 * l, 0 * l);
+				Draw_Parallepiped(0, 0 * l, -0.5 * l, 1.01 * l, 1.01 * l, 1.01 * l, 5, 5);
+			}
+			glPopMatrix();
+			// Хвост
+			glPushMatrix();
+			{
+				glColor3f(192 / 255.0, 192 / 255.0, 192 / 255.0);
+				glTranslated(0 * l, -8 * l, 0 * l);
+				glRotatef(37, 1, 0, 0);
+				Draw_Parallepiped(0, -2 * l, 0 * l, 2 * l, 7 * l, 2 * l, 5, 5);
+
+			}
+			glPopMatrix();
+			// Ноги
+			glTranslated(0, 0, -3 * l);
+			glPushMatrix();
+			{
+				glPushMatrix();
+				{
+					glTranslated(-2 * l, 6.5 * l, 0 * l);
+					glRotated(-(-22.5 + abs(heroPar)), 1, 0, 0);
+					Draw_Parallepiped(0, 0, -2.5 * l, 2 * l, 2 * l, 6 * l, 5, 5);
+				}
+				glPopMatrix();
+				glPushMatrix();
+				{
+					glTranslated(-2 * l, -6.5 * l, 0 * l);
+					glRotated(-(-22.5 + abs(heroPar)), 1, 0, 0);
+					Draw_Parallepiped(0, 0, -2.5 * l, 2 * l, 2 * l, 6 * l, 5, 5);
+				}
+				glPopMatrix();
+				glPushMatrix();
+				{
+					glTranslated(2 * l, 6.5 * l, 0 * l);
+					glRotated(-22.5 + abs(heroPar), 1, 0, 0);
+					Draw_Parallepiped(0, 0, -2.5 * l, 2 * l, 2 * l, 6 * l, 5, 5);
+				}
+				glPopMatrix();
+				glPushMatrix();
+				{
+					glTranslated(2 * l, -6.5 * l, 0 * l);
+					glRotated(-22.5 + abs(heroPar), 1, 0, 0);
+					Draw_Parallepiped(0, 0, -2.5 * l, 2 * l, 2 * l, 6 * l, 5, 5);
+				}
+				glPopMatrix();
+
+			}
+			glPopMatrix();
+			if (abs(heroPar) >= 45)
+				heroPar *= -1;
+			heroPar+=5;
+		}
+			break;
+		case ETYPE::FOUR:
+		{
+			glRotatef(180, 0, 0, 1);
+			switch (lastDir)
+			{
+			case MDIR::UP:
+				glRotatef(180, 0, 0, 1);
+				break;
+			case MDIR::RIGHT:
+				glRotatef(90, 0, 0, 1);
+				break;
+			case MDIR::DOWN:
+				// 0
+				break;
+			case MDIR::LEFT:
+				glRotatef(-90, 0, 0, 1);
+				break;
+			default:
+				break;
+			}
+			glTranslated(0, 0, 25 * l);
+			glColor3f(0 / 255.0, 204 / 255.0, 0 / 255.0);
+			// Голова 8 8 8
+			Draw_Parallepiped(0, 0, 0, 8 * l, 8 * l, 8 * l, 5, 5);
+			glPushMatrix();
+			{
+				glTranslated(0, 4.001 * l, 0);
+				// Глаза
+				glColor3f(50 / 255.0, 50 / 255.0, 50 / 255.0);
+				Draw_Parallepiped(-2 * l, 0, 1 * l, 2 * l, 0.01 * l, 2 * l, 5, 5);
+				Draw_Parallepiped(2 * l, 0, 1 * l, 2 * l, 0.01 * l, 2 * l, 5, 5);
+				// Зрачки
+				glColor3f(0 / 255.0, 0 / 255.0, 0 / 255.0);
+				Draw_Parallepiped(-1.5 * l, 0, 0.5 * l, 1 * l, 0.1 * l, 1 * l, 5, 5);
+				Draw_Parallepiped(1.5 * l, 0, 0.5 * l, 1 * l, 0.1 * l, 1 * l, 5, 5);
+				glColor3f(0 / 255.0, 204 / 255.0, 0 / 255.0);
+				// Рот
+				glColor3f(0 / 255.0, 0 / 255.0, 0 / 255.0);
+				Draw_Parallepiped(0, 0, -2 * l, 2 * l, 0.1 * l, 2 * l, 5, 5);
+				Draw_Parallepiped(0, 0, -2.5 * l, 4 * l, 0.1 * l, 1 * l, 5, 5);
+				glColor3f(50 / 255.0, 50 / 255.0, 50 / 255.0);
+				Draw_Parallepiped(0, 0, -1.5 * l, 2 * l, 0.01 * l, 3 * l, 5, 5);
+				Draw_Parallepiped(0, 0, -2 * l, 4 * l, 0.01 * l, 2 * l, 5, 5);
+				Draw_Parallepiped(-1.5 * l, 0, -2.5 * l, 1 * l, 0.01 * l, 3 * l, 5, 5);
+				Draw_Parallepiped(1.5 * l, 0, -2.5 * l, 1 * l, 0.01 * l, 3 * l, 5, 5);
+				glColor3f(0 / 255.0, 204 / 255.0, 0 / 255.0);
+			}
+			glPopMatrix();
+			// Туловище:
+			glTranslated(0, 0, -4 * l);
+			Draw_Parallepiped(0, 0, -6 * l, 8 * l, 4 * l, 12 * l, 5, 5);
+			// Ноги:
+			glTranslated(0, 0, -12 * l);
+			glPushMatrix();
+			{
+				glRotated(-(-15 + abs(heroPar)), 1, 0, 0);
+				Draw_Parallepiped(-2 * l, -3.5 * l, -4 * l, 4 * l, 4 * l, 8 * l, 5, 5);
+				Draw_Parallepiped(-2 * l, 3.5 * l, -4 * l, 4 * l, 4 * l, 8 * l, 5, 5);
+			}
+			glPopMatrix();
+			glPushMatrix();
+			{
+				glRotated(-15 + abs(heroPar), 1, 0, 0);
+				Draw_Parallepiped(2 * l, -3.5 * l, -4 * l, 4 * l, 4 * l, 8 * l, 5, 5);
+				Draw_Parallepiped(2 * l, 3.5 * l, -4 * l, 4 * l, 4 * l, 8 * l, 5, 5);
+			}
+			glPopMatrix();
+			if (abs(heroPar) == 30)
+				heroPar *= -1;
+			heroPar++;
+		}
+			break;
+		default:
+			break;
+		}
 	}
-	
+	glPopMatrix();
 }
 
 void Enemy::move() noexcept
@@ -295,10 +649,12 @@ bool Enemy::addMove(MDIR dir, const std::vector<std::vector<bool>>& lvl) noexcep
 	if (iy >= lvl.size() || ix >= lvl[0].size() || ix < 0 || iy < 0)
 		return false;
 
+
 	if (lvl[iy][ix])
 	{
 		dirQ.push({ 0, dir });
 		nextPos = QPoint(x, y);
+		
 		return true;
 	}
 	return false;
