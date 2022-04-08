@@ -98,7 +98,7 @@ void Game3D::resizeGL(int w, int h)
     glMatrixMode(GL_PROJECTION);
     glViewport(0, 0, width(), height());
     glLoadIdentity();
-    static const int magic = 2 * (1000 * sqrt(2) + 1);
+    static const int magic = 2 * (sqrt(w * w + h * h) + 1);
     glOrtho(-w, w, -h, h, -magic, magic);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -753,10 +753,8 @@ void Game3D::addMove()
         return;
 
     for (auto&& en : enemies)
-    {
-        if (en->getType() != Enemy::ETYPE::ONE && en->getType() != Enemy::ETYPE::FOUR)
+        if (en->getType() == Enemy::ETYPE::THREE)
             en->addMove(lvlMovable, p->getIndexPos());
-    }
 }
 
 void Game3D::addFastMove()
@@ -765,7 +763,7 @@ void Game3D::addFastMove()
         return;
 
     for (auto&& en : enemies)
-        if (en->getType() == Enemy::ETYPE::ONE || en->getType() == Enemy::ETYPE::FOUR)
+        if (en->getType() != Enemy::ETYPE::THREE)
             en->addMove(lvlMovable, p->getIndexPos());
 }
 

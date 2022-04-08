@@ -4,7 +4,7 @@ Player::Player(QPoint pos, int cellSize, int health, int maxHealth) noexcept
 	: Entity(pos, cellSize), health(health), maxHealth(maxHealth)
 {
     glGenTextures(1, &textures);
-    photo_image = auxDIBImageLoad(L"D:\\VisualStudio22\\Codes\\Game\\Game\\Hero.bmp");
+    photo_image = auxDIBImageLoad(L"Hero.bmp");
     
 }
 

@@ -4,7 +4,7 @@ Enemy::Enemy(QPoint pos, int cellSize, ETYPE type) noexcept
 	: Entity(pos, cellSize), type(type)
 {
 	glGenTextures(1, &textures);
-	photo_image = auxDIBImageLoad(L"D:\\VisualStudio22\\Codes\\Game\\Game\\Z.bmp");
+	photo_image = auxDIBImageLoad(L"Z.bmp");
 }
 
 Enemy::ETYPE Enemy::getType() const noexcept
@@ -536,7 +536,6 @@ void Enemy::move() noexcept
 	switch (type)
 	{
 	case ETYPE::ONE:
-	case ETYPE::TWO:
 	{
 		switch (dirQ.front().second)
 		{
@@ -557,6 +556,33 @@ void Enemy::move() noexcept
 
 		if (dirQ.front().first >= 10)
 			dirQ.pop();
+	}
+	break;
+	case ETYPE::TWO:
+	{
+		switch (dirQ.front().second)
+		{
+		case MDIR::UP:
+			pos.ry() += cellSize / 10;
+			break;
+		case MDIR::RIGHT:
+			pos.rx() += cellSize / 10;
+			break;
+		case MDIR::DOWN:
+			pos.ry() -= cellSize / 10;
+			break;
+		case MDIR::LEFT:
+			pos.rx() -= cellSize / 10;
+			break;
+		}
+		++dirQ.front().first;
+
+		if (dirQ.front().first >= 10)
+		{
+			std::queue<std::pair<int, MDIR>> empty;
+			dirQ.swap(empty);
+			nextPos = pos;
+		}
 	}
 	break;
 	/*case ETYPE::TWO:
@@ -607,7 +633,6 @@ void Enemy::move() noexcept
 		++dirQ.front().first;
 
 		if (dirQ.front().first >= 10)
-			/*dirQ.pop();*/
 		{
 			std::queue<std::pair<int, MDIR>> empty;
 			dirQ.swap(empty);
