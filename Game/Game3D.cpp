@@ -135,6 +135,9 @@ void Game3D::paintGL()
 
 void Game3D::wheelEvent(QWheelEvent* wheel)
 {
+    if (state != STATE::GAME)
+        return;
+
     double s = 1;
     if (wheel->delta() > 0)
         s = 1.1;
@@ -146,6 +149,9 @@ void Game3D::wheelEvent(QWheelEvent* wheel)
 
 void Game3D::mouseMoveEvent(QMouseEvent* e)
 {
+    if (state != STATE::GAME)
+        return;
+
     if (e->pos().x() >= 0 && e->pos().x() <= width() && e->pos().y() >= 0 && e->pos().y() <= height())
     {
         glRotatef((e->pos().y() - mousePos.y()) / 5.f, 1, -0.6, 0);
@@ -240,14 +246,15 @@ void Game3D::drawGAME()
 {
     double kx = lvl[0].size() * cellSize / 2. / static_cast<double>(width());
     double ky = lvl.size() * cellSize / 2. / static_cast<double>(height());
-    double x0 = -width() * kx - cellSize / 2;
-    double y0 = -height() * ky - cellSize / 2;
+    double x0 = -width() * kx; //- cellSize / 2;
+    double y0 = -height() * ky; //- cellSize / 2;
 
     // ПОЛ
     glColor3f(222 / 255., 169 / 255., 113 / 255.);
     glPushMatrix();
     {
-        glTranslatef(-cellSize / 2., -cellSize / 2., 0);
+        //glTranslatef(-cellSize / 2., -cellSize / 2., 0);
+        //glTranslatef(cellSize / 2., cellSize / 2., 0); // потестить этот варик
         glBegin(GL_QUADS);
         {
             int rx = cellSize / 2 * lvl[0].size() - cellSize / 2;
@@ -263,7 +270,7 @@ void Game3D::drawGAME()
 
     for (int i = -static_cast<int>((lvl[0].size() / 2)); i < static_cast<int>(lvl[0].size() / 2); ++i)
         for (int j = -static_cast<int>((lvl.size() / 2)); j < static_cast<int>(lvl.size() / 2); ++j)
-                drawWall({ i,j,0 }, cellSize / 2., lvl[j + lvl.size() / 2][i + lvl[0].size() / 2]);
+                drawWall({ i + 0.5,j + 0.5,0 }, cellSize / 2., lvl[j + lvl.size() / 2][i + lvl[0].size() / 2]);
 
     p->draw({ x0,y0 }, 4);
 
@@ -277,6 +284,12 @@ void Game3D::drawGAME()
         for (auto&& d : dl)
             if (d)
                 d->draw({ x0,y0 }, 4);
+
+    begin2D();
+    {
+        drawBars();
+    }
+    end2D();
 }
 
 void Game3D::drawPAUSE()
@@ -297,6 +310,117 @@ void Game3D::drawWIN()
 void Game3D::drawLOSE()
 {
     throw std::exception("HUI");
+}
+
+void Game3D::begin2D()
+{
+    glDisable(GL_DEPTH_TEST);
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, width(), 0, height());
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+}
+
+void Game3D::end2D()
+{
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glEnable(GL_DEPTH_TEST);
+}
+
+void Game3D::drawBars()
+{
+    glPushMatrix();
+    {
+        { // полоска хп
+            const double h = p->getHP() / static_cast<double>(p->getMaxHP());
+            constexpr double hpLength = 200;
+            constexpr double hpHeight = 65;
+
+            glColor3f(1 - h, h, 0);
+            glBegin(GL_QUADS);
+            {
+                glVertex2f(0, 0);
+                glVertex2f(h * hpLength, 0);
+                glVertex2f(h * hpLength, hpHeight);
+                glVertex2f(0, hpHeight);
+            }
+            glEnd();
+
+
+            glColor3f(1, 1, 1);
+            glLineWidth(3);
+            glBegin(GL_LINE_LOOP);
+            {
+                glVertex2f(0, 0);
+                glVertex2f(hpLength, 0);
+                glVertex2f(hpLength, hpHeight);
+                glVertex2f(0, hpHeight);
+            }
+            glEnd();
+            glLineWidth(1);
+        }
+
+        { // прогресс в сборе @монеток@
+            const double m = (startMoney - currentMoney) / static_cast<double>(startMoney);
+            constexpr double moneyLength = 200;
+            constexpr double moneyHeight = 65;
+
+            glColor3f(1 - m, m, 1 - m);
+            glBegin(GL_QUADS);
+            {
+                glVertex2f(width() - moneyLength, 0);
+                glVertex2f(width() + moneyLength * (m - 1), 0);
+                glVertex2f(width() + moneyLength * (m - 1), moneyHeight);
+                glVertex2f(width() - moneyLength, moneyHeight);
+            }
+            glEnd();
+
+            glColor3f(1, 1, 1);
+            glLineWidth(3);
+            glBegin(GL_LINE_LOOP);
+            {
+                glVertex2f(width(), 0);
+                glVertex2f(width(), moneyHeight);
+                glVertex2f(width() - moneyLength, moneyHeight);
+                glVertex2f(width() - moneyLength, 0);
+            }
+            glEnd();
+            glLineWidth(1);
+        }
+
+        // если меньше 45 секунд осталось, то рисуем предупреждение!
+        if (gameTime <= 45)
+        {
+            constexpr double triangleLength = 70;
+            constexpr double triangleHeight = 100;
+            glColor3f(229 / 255., 190 / 255., 1 / 255.);
+            glBegin(GL_TRIANGLES);
+            {
+                glVertex2f(width() / 2., triangleHeight + 15);
+                glVertex2f(width() / 2. - triangleLength, 15);
+                glVertex2f(width() / 2. + triangleLength, 15);
+            }
+            glEnd();
+
+            glColor3f(1, 1, 1);
+            glLineWidth(3);
+            glBegin(GL_LINE_LOOP);
+            {
+                glVertex2f(width() / 2., triangleHeight + 15);
+                glVertex2f(width() / 2. - triangleLength, 15);
+                glVertex2f(width() / 2. + triangleLength, 15);
+            }
+            glEnd();
+            glLineWidth(1);
+        }
+    }
+    glPopMatrix();
 }
 
 bool Game3D::isValidCharacter(const char& c) const noexcept
@@ -402,6 +526,10 @@ void Game3D::loadLVL(QString path)
                     diamonds[i][j] = new Diamond(QPoint(j * cellSize + cellSize / 2, i * cellSize + cellSize / 2), cellSize);
                 else
                     diamonds[i][j] = nullptr;
+
+        startMoney = 0;
+        for (auto&& line : lvl)
+            startMoney += std::count(line.begin(), line.end(), 'o');
 
         INfile >> tempW;
         if (tempW != "PLAYER")
@@ -685,11 +813,11 @@ void Game3D::gameStep()
         updateGL();
     }
 
-    int sum{};
+    currentMoney = 0;
     for (auto&& line : lvl)
-        sum += std::count(line.begin(), line.end(), 'o');
+        currentMoney += std::count(line.begin(), line.end(), 'o');
 
-    if (!sum)
+    if (!currentMoney)
     {
         //buttonsWIN();
 
@@ -698,9 +826,6 @@ void Game3D::gameStep()
         // test
         setWindowTitle("YOU WON!");
     }
-
-    setWindowTitle(QString("GAME IS ONLINE. HP = {%0}. TIME = {%1}").arg(p->getHP()).arg(gameTime));
-
 }
 
 void Game3D::movePlayer()

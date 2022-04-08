@@ -252,9 +252,9 @@ void Enemy::draw(std::pair<double, double> t0, double l) const noexcept
 				glPopMatrix();
 			}
 			glPopMatrix();
-			if (abs(heroPar) >= 30)
+			/*if (abs(heroPar) >= 30)
 				heroPar *= -1;
-			heroPar += 3;
+			heroPar += 3;*/
 		}
 			break;
 
@@ -338,9 +338,9 @@ void Enemy::draw(std::pair<double, double> t0, double l) const noexcept
 				Draw_Parallepiped(0, 0, -20 * l, 2 * l, 2 * l, 30 * l, 10, 10);
 			}
 			glPopMatrix();
-			if (abs(heroPar) >= 30)
+			/*if (abs(heroPar) >= 30)
 				heroPar *= -1;
-			heroPar += 1;
+			heroPar += 1;*/
 		}
 			break;
 
@@ -444,9 +444,9 @@ void Enemy::draw(std::pair<double, double> t0, double l) const noexcept
 
 			}
 			glPopMatrix();
-			if (abs(heroPar) >= 45)
+			/*if (abs(heroPar) >= 45)
 				heroPar *= -1;
-			heroPar+=5;
+			heroPar+=5;*/
 		}
 			break;
 		case ETYPE::FOUR:
@@ -516,9 +516,9 @@ void Enemy::draw(std::pair<double, double> t0, double l) const noexcept
 				Draw_Parallepiped(2 * l, 3.5 * l, -4 * l, 4 * l, 4 * l, 8 * l, 5, 5);
 			}
 			glPopMatrix();
-			if (abs(heroPar) == 30)
+			/*if (abs(heroPar) == 30)
 				heroPar *= -1;
-			heroPar++;
+			heroPar++;*/
 		}
 			break;
 		default:
@@ -556,6 +556,10 @@ void Enemy::move() noexcept
 
 		if (dirQ.front().first >= 10)
 			dirQ.pop();
+
+		if (abs(heroPar) >= 30)
+			heroPar *= -1;
+		heroPar += 3;
 	}
 	break;
 	case ETYPE::TWO:
@@ -583,13 +587,12 @@ void Enemy::move() noexcept
 			dirQ.swap(empty);
 			nextPos = pos;
 		}
+
+		if (abs(heroPar) >= 30)
+			heroPar *= -1;
+		heroPar += 1;
 	}
 	break;
-	/*case ETYPE::TWO:
-	{
-
-	}
-	break;*/
 	case ETYPE::THREE:
 	{
 		switch (dirQ.front().second)
@@ -611,6 +614,10 @@ void Enemy::move() noexcept
 
 		if (dirQ.front().first >= 5)
 			dirQ.pop();
+
+		if (abs(heroPar) >= 45)
+			heroPar *= -1;
+		heroPar += 5;
 	}
 	break;
 	case ETYPE::FOUR:
@@ -638,6 +645,10 @@ void Enemy::move() noexcept
 			dirQ.swap(empty);
 			nextPos = pos;
 		}
+
+		if (abs(heroPar) == 30)
+			heroPar *= -1;
+		heroPar++;
 	}
 	break;
 	default:

@@ -161,9 +161,9 @@ void Player::draw(std::pair<double, double> t0, double l) const noexcept
         
     }
     glPopMatrix();
-    if (abs(heroPar) == 30)
+    /*if (abs(heroPar) == 30)
         heroPar *= -1;
-    heroPar += 6;
+    heroPar += 6;*/
 }
 
 bool Player::addMove(MDIR dir, const std::vector<std::vector<bool>>& lvl) noexcept
@@ -208,7 +208,6 @@ void Player::move() noexcept
 	if (!isReadyToMove())
 		return; // check if idiot
 
-
 	switch (dirQ.front().second)
 	{
 	case MDIR::UP:
@@ -228,4 +227,8 @@ void Player::move() noexcept
 
 	if (dirQ.front().first >= 10)
 		dirQ.pop();
+
+    if (abs(heroPar) == 30)
+        heroPar *= -1;
+    heroPar += 6;
 }

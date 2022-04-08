@@ -91,7 +91,15 @@ private:
 	void drawWIN();
 	void drawLOSE();
 
+	void begin2D();
+	void end2D();
+
+	void drawBars();
+
 	int gameTime;
+	int startMoney;
+	int currentMoney;
+
 	std::vector<std::vector<char>> lvl;
 	std::vector<std::vector<bool>> lvlMovable;
 	
