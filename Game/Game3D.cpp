@@ -53,7 +53,15 @@ Game3D::Game3D(QGLWidget*parent)
     eT = auxDIBImageLoad(L"Z.bmp");
     glGenTextures(1, &texE);
 
+    wT = auxDIBImageLoad(L"WinFun.bmp");
+    glGenTextures(1, &texW);
+
+    lT = auxDIBImageLoad(L"LoseFun.bmp");
+    glGenTextures(1, &texL);
+
     isNew = false;
+
+    fun = false;
 
     setState(STATE::MENU);
 }
@@ -82,6 +90,10 @@ Game3D::~Game3D()
     delete pT;
     delete eT->data;
     delete eT;
+    delete wT->data;
+    delete wT;
+    delete lT->data;
+    delete lT;
 }
 
 void Game3D::initializeGL()
@@ -312,6 +324,12 @@ void Game3D::keyPressEvent(QKeyEvent* e)
                 light = true;
             }
     }
+
+    if (e->key() == Qt::Key_F)
+    {
+        fun = !fun;
+        updateGL();
+    }
 }
 
 void Game3D::drawGAME()
@@ -388,6 +406,38 @@ void Game3D::drawWIN()
     begin2D();
     {
         drawButtons(flags);
+
+        if (fun)
+        {
+            const double bWidth = width() / 8.;
+            const double r = (bWidth > height() ? height() / 2. : bWidth / 2);
+
+            const double x0 = width() / 6.;
+            const double y0 = height() / 2. + 1.2 * r;
+            const double hx = 4 * x0;
+
+            glBindTexture(GL_TEXTURE_2D, texW);
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexImage2D(GL_TEXTURE_2D, 0, 3,
+                wT->sizeX,
+                wT->sizeY,
+                0, GL_RGB, GL_UNSIGNED_BYTE,
+                wT->data);
+            glEnable(GL_TEXTURE_2D);
+            {
+                glBindTexture(GL_TEXTURE_2D, texW);
+                glBegin(GL_QUADS);
+                glColor3d(1, 1, 1);
+                glTexCoord2d(0, 0); glVertex2f(x0, y0);
+                glTexCoord2d(1, 0); glVertex2f(x0 + hx, y0);
+                glTexCoord2d(1, 1); glVertex2f(x0 + hx, height());
+                glTexCoord2d(0, 1); glVertex2f(x0, height());
+                glEnd();
+            }
+            glDisable(GL_TEXTURE_2D);
+        }
     }
     end2D();
 }
@@ -397,6 +447,37 @@ void Game3D::drawLOSE()
     begin2D();
     {
         drawButtons(flags);
+        if (fun)
+        {
+            const double bWidth = width() / 8.;
+            const double r = (bWidth > height() ? height() / 2. : bWidth / 2);
+
+            const double x0 = width() / 6.;
+            const double y0 = height() / 2. + 1.2 * r;
+            const double hx = 4 * x0;
+
+            glBindTexture(GL_TEXTURE_2D, texL);
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexImage2D(GL_TEXTURE_2D, 0, 3,
+                lT->sizeX,
+                lT->sizeY,
+                0, GL_RGB, GL_UNSIGNED_BYTE,
+                lT->data);
+            glEnable(GL_TEXTURE_2D);
+            {
+                glBindTexture(GL_TEXTURE_2D, texL);
+                glBegin(GL_QUADS);
+                glColor3d(1, 1, 1);
+                glTexCoord2d(0, 0); glVertex2f(x0, y0);
+                glTexCoord2d(1, 0); glVertex2f(x0 + hx, y0);
+                glTexCoord2d(1, 1); glVertex2f(x0 + hx, height());
+                glTexCoord2d(0, 1); glVertex2f(x0, height());
+                glEnd();
+            }
+            glDisable(GL_TEXTURE_2D);
+        }
     }
     end2D();
 }

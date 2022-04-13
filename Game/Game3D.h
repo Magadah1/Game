@@ -100,6 +100,7 @@ private:
 	void drawBars();
 	void drawButtons(const std::bitset<5>& flags);
 	std::bitset<5> flags; // cont, save, select, restart, exit
+	bool fun;
 
 	int gameTime;
 	int startMoney;
@@ -113,8 +114,8 @@ private:
 	std::vector<Bonus*> bonuses;
 	std::vector<std::vector<Diamond*>> diamonds;
 
-	AUX_RGBImageRec* pT, * eT;
-	GLuint texP, texE;
+	AUX_RGBImageRec* pT, * eT, * wT, * lT;
+	GLuint texP, texE, texW, texL;
 
 	bool isValidCharacter(const char& c) const noexcept;
 	bool isWall(const char& c) const noexcept;
