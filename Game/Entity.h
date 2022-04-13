@@ -11,7 +11,7 @@ class Entity
 {
 	//Q_OBJECT;
 public:
-	Entity(QPoint pos, int cellSize) noexcept;
+	Entity(QPoint pos, int cellSize, AUX_RGBImageRec* tex = nullptr, GLuint t = 0) noexcept;
 
 	typedef enum class MOVEMENT_DIRECTION
 	{

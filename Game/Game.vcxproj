@@ -110,12 +110,6 @@
     <QtUic Include="MainGame.ui" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="current_lvl.txt" />
-    <Text Include="lvl_1.txt" />
-    <Text Include="lvl_2.txt" />
-    <Text Include="lvl_3.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Bonus.h" />
     <ClInclude Include="Diamond.h" />
     <ClInclude Include="Enemy.h" />

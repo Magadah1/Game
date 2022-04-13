@@ -44,6 +44,17 @@ Game3D::Game3D(QGLWidget*parent)
     immunityBonusTimer = new QTimer();
     connect(immunityBonusTimer, &QTimer::timeout, this, &Game3D::immunityBonus);
 
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    pT = auxDIBImageLoad(L"Hero.bmp");
+    glGenTextures(1, &texP);
+
+    eT = auxDIBImageLoad(L"Z.bmp");
+    glGenTextures(1, &texE);
+
+    isNew = false;
+
     setState(STATE::MENU);
 }
 
@@ -66,17 +77,25 @@ Game3D::~Game3D()
     delete createBonusTimer;
     delete freezeBonusTimer;
     delete immunityBonusTimer;
+
+    delete pT->data;
+    delete pT;
+    delete eT->data;
+    delete eT;
 }
 
 void Game3D::initializeGL()
 {
 	glEnable(GL_DEPTH_TEST);
 
-	glEnable(GL_LIGHTING);
+	//glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
 	glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
     glEnable(GL_LIGHT0);
+    float GL_LIGHT0_CORD[] = { 0,0,700, 1 };
+    glLightfv(GL_LIGHT0, GL_POSITION, GL_LIGHT0_CORD);
+    //float GL_LIGHT0_DIR[] = {}
 
 
 
@@ -169,42 +188,38 @@ void Game3D::mousePressEvent(QMouseEvent* e)
     if (flags.none())
         return;
 
-    const double bWidth = width() * 0.8;
-    const double bHeigth = height() / 7.;
-    const double betweenB = bHeigth / 3.;
+    const double bWidth = width() / 8.;
 
-    const double x0 = (width() - bWidth) / 2.;
-    double y0 = betweenB;
+    const double r = (bWidth > height() ? height() / 2. : bWidth / 2) * 2;
+
+
+    const double centerB = width() / 6.;
+
+    std::pair<float, float> center{ centerB, height() / 2. };
+    auto& [x, y] = center;
 
     if (flags[0]) // продолжить
-    {
-        if (e->pos().x() >= x0 && e->pos().x() <= x0 + bWidth
-            && e->pos().y() >= y0 && e->pos().y() <= y0 + bHeigth)
+        if (e->pos().x() >= x - r / 2. && e->pos().x() <= x + r / 2. &&
+            e->pos().y() >= y - r / 2. && e->pos().y() <= y + r / 2.)
         {
             setState(STATE::GAME);
             return;
         }
-    }
 
-    y0 += bHeigth + betweenB;
-
+    x += centerB;
     if (flags[1]) // сохранить
-    {
-        if (e->pos().x() >= x0 && e->pos().x() <= x0 + bWidth
-            && e->pos().y() >= y0 && e->pos().y() <= y0 + bHeigth)
+        if (e->pos().x() >= x - r / 2. && e->pos().x() <= x + r / 2. &&
+            e->pos().y() >= y - r / 2. && e->pos().y() <= y + r / 2.)
         {
             saveCurrentLVLState(path);
             setState(STATE::GAME);
             return;
         }
-    }
 
-    y0 += bHeigth + betweenB;
-
-    if (flags[2]) // выбор уровня
-    {
-        if (e->pos().x() >= x0 && e->pos().x() <= x0 + bWidth
-            && e->pos().y() >= y0 && e->pos().y() <= y0 + bHeigth)
+    x += centerB;
+    if (flags[2]) // загрузить
+        if (e->pos().x() >= x - r / 2. && e->pos().x() <= x + r / 2. &&
+            e->pos().y() >= y - r / 2. && e->pos().y() <= y + r / 2.)
         {
             QString path = QFileDialog::getOpenFileName();
 
@@ -215,31 +230,24 @@ void Game3D::mousePressEvent(QMouseEvent* e)
             loadLVL(this->path);
             return;
         }
-    }
 
-    y0 += bHeigth + betweenB;
-
+    x += centerB;
     if (flags[3]) // рестарт
-    {
-        if (e->pos().x() >= x0 && e->pos().x() <= x0 + bWidth
-            && e->pos().y() >= y0 && e->pos().y() <= y0 + bHeigth)
+        if (e->pos().x() >= x - r / 2. && e->pos().x() <= x + r / 2. &&
+            e->pos().y() >= y - r / 2. && e->pos().y() <= y + r / 2.)
         {
             loadLVL(path);
             return;
         }
-    }
 
-    y0 += bHeigth + betweenB;
-
+    x += centerB;
     if (flags[4]) // выход
-    {
-        if (e->pos().x() >= x0 && e->pos().x() <= x0 + bWidth
-            && e->pos().y() >= y0 && e->pos().y() <= y0 + bHeigth)
+        if (e->pos().x() >= x - r / 2. && e->pos().x() <= x + r / 2. &&
+            e->pos().y() >= y - r / 2. && e->pos().y() <= y + r / 2.)
         {
             close();
             return;
         }
-    }
 }
 
 void Game3D::keyPressEvent(QKeyEvent* e)
@@ -290,13 +298,24 @@ void Game3D::keyPressEvent(QKeyEvent* e)
             for (auto&& en : enemies)
                 en->fun(!en->getFun());
         }
+
+        static bool light = true;
+        if (e->key() == Qt::Key_L)
+            if (light)
+            {
+                glDisable(GL_LIGHT0);
+                light = false;
+            }
+            else
+            {
+                glEnable(GL_LIGHT0);
+                light = true;
+            }
     }
 }
 
 void Game3D::drawGAME()
 {
-    // НУЖНА НОРМАЛЬНАЯ ЛОГИКА ДЛЯ НЕЧЁТНЫХ РАЗМЕРОВ
-
     double kx = lvl[0].size() * cellSize / 2. / static_cast<double>(width());
     double ky = lvl.size() * cellSize / 2. / static_cast<double>(height());
     double x0 = -width() * kx + ((lvl[0].size() % 2)  ? cellSize / 2. : 0);
@@ -386,10 +405,12 @@ void Game3D::setState(STATE newState)
 {
     state = newState;
     flags.reset();
+    glDisable(GL_LIGHTING);
     switch (state)
     {
     case Game3D::STATE::GAME:
     {
+        glEnable(GL_LIGHTING);
         gameTimer->start(gameTimerStep);
         moveEnemyTimer->start(moveEnemyTimerStep);
         movePlayerTimer->start(movePlayerTimerStep);
@@ -397,6 +418,7 @@ void Game3D::setState(STATE newState)
         addFastMoveTimer->start(addFastMoveTimerStep);
         checkCollisionTimer->start(checkCollisionTimerStep);
         createBonusTimer->start(createBonusTimerStep);
+        setWindowTitle("Very funny Game");
     }
         break;
     case Game3D::STATE::PAUSE:
@@ -564,74 +586,212 @@ void Game3D::drawBars()
 
 void Game3D::drawButtons(const std::bitset<5>& flags)
 {
-    const double bWidth = width() * 0.8;
-    const double bHeigth = height() / 7.;
-    const double betweenB = bHeigth / 3.;
-
-    const double x0 = (width() - bWidth) / 2.;
-    double y0 = betweenB;
-
-    glBegin(GL_QUADS);
+    auto drawCircle = [&](std::pair<float, float> c, float r, float alpha, int num_s) -> void
     {
-        if (flags[4]) // выход
+        glBegin(GL_POLYGON);
+        for (int i = 0; i < num_s; i++)
         {
-            glColor3f(1, 0, 0);
-            glVertex2f(x0, y0);
-            glVertex2f(x0 + bWidth, y0);
-            glVertex2f(x0 + bWidth, y0 + bHeigth);
-            glVertex2f(x0, y0 + bHeigth);
+            float theta = 2.0f * acos(-1) * float(i) / float(num_s);//get the current angle
+
+            float x = r * cosf(alpha + theta);//calculate the x component
+            float y = r * sinf(alpha + theta);//calculate the y component
+
+            glVertex2f(x + c.first, y + c.second);//output vertex
         }
+        glEnd();
+    };
 
-        y0 += bHeigth + betweenB;
+    const double bWidth = width() / 8.;
 
-        if (flags[3]) // рестарт
-        {
-            glColor3f(0, 1, 0);
-            glVertex2f(x0, y0);
-            glVertex2f(x0 + bWidth, y0);
-            glVertex2f(x0 + bWidth, y0 + bHeigth);
-            glVertex2f(x0, y0 + bHeigth);
-        }
+    const double r = (bWidth > height() ? height() / 2. : bWidth / 2);
 
-        y0 += bHeigth + betweenB;
+    const double centerB = width() / 6.;
 
-        if (flags[2]) // выбор
-        {
-            glColor3f(0, 0, 1);
-            glVertex2f(x0, y0);
-            glVertex2f(x0 + bWidth, y0);
-            glVertex2f(x0 + bWidth, y0 + bHeigth);
-            glVertex2f(x0, y0 + bHeigth);
-        }
+    std::pair<float, float> center{ centerB, height() / 2. };
+    auto& [x, y] = center;
 
-        y0 += bHeigth + betweenB;
+    if (flags[0]) // продолжить
+    {
+        glColor3f(0, 0.7, 0);
+        drawCircle(center, r, 0, 40);
 
-        if (flags[1]) // сохранить
-        {
-            glColor3f(1, 0, 1);
-            glVertex2f(x0, y0);
-            glVertex2f(x0 + bWidth, y0);
-            glVertex2f(x0 + bWidth, y0 + bHeigth);
-            glVertex2f(x0, y0 + bHeigth);
-        }
-
-        y0 += bHeigth + betweenB;
-
-        if (flags[0]) // продолжить
-        {
-            glColor3f(1, 1, 0);
-            glVertex2f(x0, y0);
-            glVertex2f(x0 + bWidth, y0);
-            glVertex2f(x0 + bWidth, y0 + bHeigth);
-            glVertex2f(x0, y0 + bHeigth);
-        }
+        glColor3f(0.9, 0.9, 0.9);
+        drawCircle(center, r * 0.8, 0, 3);
     }
-    glEnd();
+
+    x += centerB;
+    if (flags[1]) // сохранить
+    {
+        glColor3f(0.4, 0.4, 0.4);
+        drawCircle(center, r, 0, 40);
+
+        glColor3f(0.9, 0.9, 0.9);
+        double rr = r * 0.9;
+        drawCircle(center, rr, 3.1415926 / 4, 4);
+
+        glColor3f(0.4, 0.4, 0.4);
+        glBegin(GL_POLYGON);
+        {
+            glVertex2f(x + rr / sqrt(2), y + rr / sqrt(2));
+            glVertex2f(x + rr * 0.4, y + rr / sqrt(2));
+            glVertex2f(x + rr / sqrt(2), y + rr * 0.4);
+        }
+        glEnd();
+
+        glBegin(GL_POLYGON);
+        {
+            glVertex2f(x + rr * 0.55, y - rr * 0.1);
+            glVertex2f(x + rr * 0.55, y - rr * 0.6);
+            glVertex2f(x - rr * 0.55, y - rr * 0.6);
+            glVertex2f(x - rr * 0.55, y - rr * 0.1);
+        }
+        glEnd();
+
+        glBegin(GL_POLYGON);
+        {
+            glVertex2f(x + rr * 0.3, y + rr * 0.6);
+            glVertex2f(x + rr * 0.3, y + rr * 0.1);
+            glVertex2f(x - rr * 0.55, y + rr * 0.1);
+            glVertex2f(x - rr * 0.55, y + rr * 0.6);
+        }
+        glEnd();
+
+        glColor3f(0.9, 0.9, 0.9);
+
+        glBegin(GL_POLYGON);
+        {
+            glVertex2f(x + rr * 0.25, y + rr * 0.55);
+            glVertex2f(x + rr * 0.25, y + rr * 0.15);
+            glVertex2f(x, y + rr * 0.15);
+            glVertex2f(x, y + rr * 0.55);
+        }
+        glEnd();
+    }
+
+    x += centerB;
+    if (flags[2]) // выбор
+    {
+        glColor3f(0, 0, 0.9);
+        drawCircle(center, r, 0, 40);
+
+        glColor3f(0.9, 0.9, 0.9);
+        drawCircle({ x, y - r * 0.3 }, r * 0.5, acos(-1) / 3 * 2.5, 3);
+        drawCircle({ x, y - r * 0.1 }, r * 0.2, acos(-1) / 4, 4);
+        drawCircle({ x, y + r * 0.1 }, r * 0.2, acos(-1) / 4, 4);
+        drawCircle({ x, y + r * 0.3 }, r * 0.2, acos(-1) / 4, 4);
+        drawCircle({ x, y + r * 0.5 }, r * 0.2, acos(-1) / 4, 4);
+    }
+
+    x += centerB;
+    if (flags[3]) // рестарт
+    {
+        glColor3f(1, 168. / 255, 0);
+        drawCircle(center, r, 0, 40);
+
+        glColor3f(0.9, 0.9, 0.9);
+
+        double temp_r = 0.7 * r;
+        glBegin(GL_POLYGON);
+        {
+            for (int i = 0; i < 35; i++)
+            {
+                float theta = 2.0f * acos(-1) * float(i) / 50.;//get the current angle
+
+                float temp_x = temp_r * cosf(theta);//calculate the x component
+                float temp_y = temp_r * sinf(theta);//calculate the y component
+
+                glVertex2f(x + temp_x, y + temp_y);//output vertex
+
+            }
+        }
+        glEnd();
+
+        glColor3f(1, 168. / 255, 0);
+
+        glBegin(GL_POLYGON);
+        {
+            temp_r = 0.5 * r;
+
+            for (int i = 0; i < 35; i++)
+            {
+                float theta = 2.0f * acos(-1) * float(i) / 50.;//get the current angle
+
+
+                float temp_x = temp_r * cosf(theta);//calculate the x component
+                float temp_y = temp_r * sinf(theta);//calculate the y component
+
+                glVertex2f(x + temp_x, y + temp_y);//output vertex
+
+            }
+        }
+        glEnd();
+
+        glBegin(GL_POLYGON);
+        {
+
+            temp_r = r;
+
+            for (int i = 34; i < 55; i++)
+            {
+                float theta = 2.0f * acos(-1) * float(i) / 50.;//get the current angle
+
+                float temp_x = temp_r * cosf(theta);//calculate the x component
+                float temp_y = temp_r * sinf(theta);//calculate the y component
+
+                glVertex2f(x + temp_x, y + temp_y);//output vertex
+
+            }
+
+            temp_r = r * 0.1;
+
+            for (int i = 34; i < 55; i++)
+            {
+                float theta = 2.0f * acos(-1) * float(i) / 50.;//get the current angle
+
+                float temp_x = temp_r * cosf(theta);//calculate the x component
+                float temp_y = temp_r * sinf(theta);//calculate the y component
+
+                glVertex2f(x + temp_x, y + temp_y);//output vertex
+
+            }
+
+        }
+        glEnd();
+
+        glColor3f(0.9, 0.9, 0.9);
+        drawCircle({ x + 0.5 * r, y + 0.3 * r }, r * 0.3, acos(-1), 3);
+    }
+
+    x += centerB;
+    if (flags[4]) // выход
+    {
+        glColor3f(0.9, 0, 0);
+        drawCircle(center, r, 0, 40);
+
+        glColor3f(0.9, 0.9, 0.9);
+        glBegin(GL_POLYGON);
+        {
+            glVertex2f(x - r * 0.6, y - r * 0.4);
+            glVertex2f(x + r * 0.4, y + r * 0.6);
+            glVertex2f(x + r * 0.6, y + r * 0.4);
+            glVertex2f(x - r * 0.4, y - r * 0.6);
+        }
+        glEnd();
+
+        glBegin(GL_POLYGON);
+        {
+            glVertex2f(x + r * 0.6, y - r * 0.4);
+            glVertex2f(x + r * 0.4, y - r * 0.6);
+            glVertex2f(x - r * 0.6, y + r * 0.4);
+            glVertex2f(x - r * 0.4, y + r * 0.6);
+        }
+        glEnd();
+    }
 }
 
 bool Game3D::isValidCharacter(const char& c) const noexcept
 {
-    constexpr char valid_characters[] = { 'x', 'g', 'p', 'd', 'b', 'U', 'D', 'C', 'Q', 'e', 'o', 's', 'v' };
+    constexpr char valid_characters[] = { 'x', 'g', 'p', 'd', 'b', 'U', 'D', 'C', 'Q', 'e', 'o', 's', 'v', 'O'};
 
     for (auto&& el : valid_characters)
         if (c == el)
@@ -641,7 +801,7 @@ bool Game3D::isValidCharacter(const char& c) const noexcept
 
 bool Game3D::isWall(const char& c) const noexcept
 {
-    constexpr char walls[] = { 'x', 'g', 'p', 'd', 'b', 'U', 'D', 'C', 'Q' };
+    constexpr char walls[] = { 'x', 'g', 'p', 'd', 'b', 'U', 'D', 'C', 'Q', 'O' };
 
     for (auto&& el : walls)
         if (c == el)
@@ -658,7 +818,7 @@ void Game3D::loadLVL(QString path)
             throw std::exception("Error in loading lvl!");
         std::string tempW;
 
-        bool isNew = true;
+        isNew = true;
         INfile >> tempW;
         if (tempW != "NEW")
             throw std::exception("Did not find field \'NEW\'!");
@@ -674,8 +834,8 @@ void Game3D::loadLVL(QString path)
             throw std::exception("Did not find field \'SIZE\'!");
         size_t w, h;
         INfile >> w >> h;
-        if (w > 20 || h > 20)
-            throw std::exception("Size is too large! (Must be not greater than (20,20))");
+        if (w > 40 || h > 40)
+            throw std::exception("Size is too large! (Must be not greater than (40,40))");
 
         INfile >> tempW;
         if (tempW != "FIELD")
@@ -804,11 +964,11 @@ void Game3D::loadLVL(QString path)
                 size_t ii, jj;
 
                 INfile >> ii >> jj;
-                enemies[i] = new Enemy({ static_cast<int>(ii * cellSize + cellSize / 2), static_cast<int>(jj * cellSize + cellSize / 2) }, cellSize, t);
+                enemies[i] = new Enemy({ static_cast<int>(ii * cellSize + cellSize / 2), static_cast<int>(jj * cellSize + cellSize / 2) }, cellSize, t, eT, texE);
             }
             else
             {
-                enemies[i] = new Enemy({ static_cast<int>(enSpawnPoints[i].second * cellSize + cellSize / 2), static_cast<int>(enSpawnPoints[i].first * cellSize + cellSize / 2) }, cellSize, t);
+                enemies[i] = new Enemy({ static_cast<int>(enSpawnPoints[i].second * cellSize + cellSize / 2), static_cast<int>(enSpawnPoints[i].first * cellSize + cellSize / 2) }, cellSize, t, eT, texE);
             }
         }
 
@@ -819,7 +979,7 @@ void Game3D::loadLVL(QString path)
 
         p = new Player({ static_cast<int>(spawnPoint.second * cellSize + cellSize / 2), static_cast<int>(spawnPoint.first * cellSize + cellSize / 2) },
             cellSize,
-            (isNew ? maxhp : hp), maxhp);
+            (isNew ? maxhp : hp), maxhp, pT, texP);
 
         for (auto&& bonus : bonuses) if (bonus) delete bonus;
         bonuses.clear();
@@ -840,7 +1000,11 @@ void Game3D::loadLVL(QString path)
 
 void Game3D::saveCurrentLVLState(QString path)
 {
-    std::ofstream OUTfile((path.left(path.size() - 4) + "_current.txt").toStdString());
+    std::ofstream OUTfile;
+    if (!isNew)
+        OUTfile.open(path.toStdString());
+    else
+        OUTfile.open((path.left(path.size() - 4) + "_current.txt").toStdString());
 
     if (!OUTfile)
     {
@@ -890,7 +1054,7 @@ void Game3D::drawWall(std::tuple<float, float, float> point, double r, char c, d
             glVertex3f(+r, -r, -1);
         }
         glEnd();*/
-        glColor3f(1, 1, 1);
+        glColor3f(255 / 255., 127 / 255., 80 / 255.);
         GLUquadricObj* quadObj = gluNewQuadric();
         switch (c)
         {
@@ -970,6 +1134,14 @@ void Game3D::drawWall(std::tuple<float, float, float> point, double r, char c, d
             glTranslated(0, 0, -h * l);
             gluDisk(quadObj, 0, r * l, 20, 20);
             Entity::Draw_Parallepiped(0, r / 2 * l, h / 2 * l, r * 2 * l, r * l, h * l, 5, 5);
+            break;
+        case 'O':
+            glRotated(180, 0, 0, 1);
+            gluCylinder(quadObj, r * l, r * l, h * l, 20, 20);
+            glTranslated(0, 0, h * l);
+            gluDisk(quadObj, 0, r * l, 20, 20);
+            glTranslated(0, 0, -h * l);
+            gluDisk(quadObj, 0, r * l, 20, 20);
             break;
         default:
             break;

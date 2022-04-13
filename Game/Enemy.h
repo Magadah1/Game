@@ -14,7 +14,7 @@ public:
 		FOUR		// ”ÃÕ€… ◊≈À √Œ–∆”—‹ »Ã ( –»œ≈–)
 	} ETYPE;
 
-	Enemy(QPoint pos, int cellSize, ETYPE type = ETYPE::ONE) noexcept;
+	Enemy(QPoint pos, int cellSize, ETYPE type = ETYPE::ONE, AUX_RGBImageRec* tex = nullptr, GLuint t = 0) noexcept;
 	~Enemy();
 
 	ETYPE getType() const noexcept;

@@ -1,0 +1,30 @@
+NEW 1
+TIME 100
+SIZE 15 19
+FIELD
+gxxxxxxxxxxxxxxxxxp
+xoUoUoUoUoUoUoUoUox
+xoeoooooooooooooeox
+xoOoOoOoOoOoOoOoOox
+xvovovovovovovovovx
+xoOoOoOoOeOoOoOoOox
+xvovovovovovovovovx
+xoOoOoOeOsOeOoOoOox
+xvovovovovovovovovx
+xoOoOoOoOeOoOoOoOox
+xvovovovovovovovovx
+xoOoOoOoOoOoOoOoOox
+xoeoooooooooooooeox
+xoQoQoQoQoQoQoQoQox
+dxxxxxxxxxxxxxxxxxb
+PLAYER
+MAXHP 2
+ENEMIES 8
+TYPE 1
+TYPE 1
+TYPE 1
+TYPE 1
+TYPE 1
+TYPE 1
+TYPE 1
+TYPE 1

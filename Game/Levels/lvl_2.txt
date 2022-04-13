@@ -1,0 +1,25 @@
+NEW 1
+TIME 200
+SIZE 14 28
+FIELD
+gxxxxxxxxxxxxxxxxxxxxxxxxxxp
+xovvvvvxoxoxvvvvvvvvevvvvxox
+xvvvevvxvUvdxxxpvCxxxxxpvUvx
+xvvvvvvxvvvevvvxvvvvoxoxvvvx
+xxxpvgxxxpvCpvCbvgxxxbvxvCxx
+xvoxvxoxoxvvxvvvvxvvvvvxvvex
+xvCbvUvxvUvCxxxxxbvgxpvxxDvx
+xvvvvvvxvvvvvxxvvvvxoxvxvvvx
+xxpvOvCxxxxDvxxxDvCxvUvUvQvx
+xoxvvvvvvvvvvxxvvvvxvvvvvxvx
+xvUvgxxxDvQvCxbvQvgbvgxpvxvx
+xvvvxvvvvvxvvvvvxvxovxoUvUvx
+xovvxvgxxxxvvsvvxoxpoxvvvvox
+dxxxxxxxxxxxxxxxxxxxxxxxxxxb  
+PLAYER
+MAXHP 4
+ENEMIES 4
+TYPE 1
+TYPE 1
+TYPE 1
+TYPE 1

@@ -1,0 +1,42 @@
+NEW 1
+TIME 300
+SIZE 31 28
+FIELD
+gxxxxxxxxxxxxxxxxxxxxxxxxxxp
+xeoooooooooooxxoooooooooooex
+xogxxpogxxxpoxxogxxxpogxxpox
+xoxxxxoxxxxxoxxoxxxxxoxxxxox
+xodxxbodxxxbodbodxxxbodxxbox
+xoooooooooooooooooooooooooox
+xogxxpogpogxxxxxxpogpogxxpox
+xodxxboxxodxxxxxxboxxodxxbox
+xooooooxxooooxxooooxxoooooox
+xxxxxpoxxxxpoxxogxxxxogxxxxx
+xxxxxxoxxxxbodbodxxxxoxxxxxx
+xxxxxxoxxooooooooooxxoxxxxxx
+xxxxxxoxxoxxvvvvxxoxxoxxxxxx
+xxxxxbodboxvvvvvvxodbodxxxxx
+xoooooooooxvvvvvvxooooooooox
+xxxxxpogpoxvvvvvvxogpogxxxxx
+xxxxxxoxxoxxxxxxxxoxxoxxxxxx
+xxxxxxoxxooooooosooxxoxxxxxx
+xxxxxxoxxogxxxxxxpoxxoxxxxxx
+xxxxxbodbodxxxxxxbodbodxxxxx
+xooooooooooooxxoooooooooooox
+xogxxpogxxxpoxxogxxxpogxxpox
+xodxxxodxxxbodbodxxxboxxxbox
+xoooxxooooooooooooooooxxooox
+xxpoxxogpogxxxxxxpogpoxxogxx
+xxbodboxxodxxxxxxboxxodbodxx
+xooooooxxooooxxooooxxoooooox
+xogxxxxxxxxpoxxogxxxxxxxxpox
+xodxxxxxxxxbodbodxxxxxxxxbox
+xeooooooooooooooooooooooooex
+dxxxxxxxxxxxxxxxxxxxxxxxxxxb
+PLAYER
+MAXHP 20
+ENEMIES 4
+TYPE 4
+TYPE 3
+TYPE 2
+TYPE 1

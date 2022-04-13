@@ -1,19 +1,12 @@
 #include "Player.h"
 
-Player::Player(QPoint pos, int cellSize, int health, int maxHealth) noexcept
-	: Entity(pos, cellSize), health(health), maxHealth(maxHealth)
+Player::Player(QPoint pos, int cellSize, int health, int maxHealth, AUX_RGBImageRec* tex, GLuint t) noexcept
+	: Entity(pos, cellSize, tex, t), health(health), maxHealth(maxHealth)
 {
-    glGenTextures(1, &textures);
-    photo_image = auxDIBImageLoad(L"Hero.bmp");
 }
 
 Player::~Player()
 {
-    if (photo_image)
-    {
-        delete photo_image->data;
-        delete photo_image;
-    }
 }
 
 int Player::getHP() const noexcept
@@ -101,10 +94,13 @@ void Player::draw(std::pair<double, double> t0, double l) const noexcept
             }
             else
             {
-                
                 // Лицо Андрюши
                 glRotated(180, 0, 0, 1);
-                Draw_Parallepiped(0, 0, 0, 7.999 * l, 7.999 * l, 7.999 * l, 10, 10);
+                Draw_Parallepiped(0, 0, 0, 8 * l, 7.9 * l, 8 * l, 10, 10);
+                //AUX_RGBImageRec* photo_im = auxDIBImageLoad(L"Hero.bmp");
+                //GLuint textur;
+                //glGenTextures(1, &textures);
+                glBindTexture(GL_TEXTURE_2D, textures);
                 glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -118,7 +114,7 @@ void Player::draw(std::pair<double, double> t0, double l) const noexcept
                     glBindTexture(GL_TEXTURE_2D, textures);
                     glBegin(GL_QUADS);
                     glColor3d(1, 1, 1);
-                    glTranslated(0, 0, 4 * l);
+                    //glTranslated(0, 0, 7.1 * l);
                     glTexCoord2d(0, 0); glVertex3d(-4 * l, -4 * l, -4 * l);
                     glTexCoord2d(0, 1); glVertex3d(-4 * l, -4 * l, 4 * l);
                     glTexCoord2d(1, 1); glVertex3d(4 * l, -4 * l, 4 * l);
@@ -126,6 +122,8 @@ void Player::draw(std::pair<double, double> t0, double l) const noexcept
                     glEnd();
                 }
                 glDisable(GL_TEXTURE_2D);
+              /*  delete photo_im->data;
+                delete photo_im;*/
             }
         }
         glPopMatrix();

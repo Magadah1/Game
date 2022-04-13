@@ -6,7 +6,7 @@ class Player :
 	public Entity
 {
 public:
-	Player(QPoint pos, int cellSize, int health = 3, int maxHealth = 3) noexcept;
+	Player(QPoint pos, int cellSize, int health = 3, int maxHealth = 3, AUX_RGBImageRec* tex = nullptr, GLuint t = 0) noexcept;
 	~Player();
 
 	int getHP() const noexcept;

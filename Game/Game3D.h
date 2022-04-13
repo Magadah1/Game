@@ -43,7 +43,7 @@ public slots:
 	void createBonus();
 	void freezeBonus();
 	void immunityBonus();
-
+	
 private:
 	QTimer* gameTimer;
 	static const unsigned gameTimerStep = 1000;
@@ -113,12 +113,16 @@ private:
 	std::vector<Bonus*> bonuses;
 	std::vector<std::vector<Diamond*>> diamonds;
 
+	AUX_RGBImageRec* pT, * eT;
+	GLuint texP, texE;
+
 	bool isValidCharacter(const char& c) const noexcept;
 	bool isWall(const char& c) const noexcept;
 
 	void loadLVL(QString path);
 	void saveCurrentLVLState(QString path);
 	QString path;
+	bool isNew;
 
 	void drawWall(std::tuple<float, float, float> point, double r, char c, double coefH = 1);
 

@@ -1,19 +1,12 @@
 #include "Enemy.h"
 
-Enemy::Enemy(QPoint pos, int cellSize, ETYPE type) noexcept
-	: Entity(pos, cellSize), type(type)
+Enemy::Enemy(QPoint pos, int cellSize, ETYPE type, AUX_RGBImageRec* tex, GLuint t) noexcept
+	: Entity(pos, cellSize, tex, t), type(type)
 {
-	glGenTextures(1, &textures);
-	photo_image = auxDIBImageLoad(L"Z.bmp");
 }
 
 Enemy::~Enemy()
 {
-	if (photo_image)
-	{
-		delete photo_image->data;
-		delete photo_image;
-	}
 }
 
 Enemy::ETYPE Enemy::getType() const noexcept
@@ -190,6 +183,9 @@ void Enemy::draw(std::pair<double, double> t0, double l) const noexcept
 				}
 				else
 				{
+					//GLuint textu;
+					//glGenTextures(1, &textures);
+					glBindTexture(GL_TEXTURE_2D, textures);
 					glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -291,7 +287,7 @@ void Enemy::draw(std::pair<double, double> t0, double l) const noexcept
 				break;
 			}
 			
-			glTranslated(0, 0, 36 * l);
+			glTranslated(0, 0, 37 * l);
 			glColor3f(26 / 255.0, 26 / 255.0, 26 / 255.0);
 			Draw_Parallepiped(0, 0, 0, 8 * l, 5 * l, 16 * l, 10, 10); // Туловище
 			// Голова
@@ -572,7 +568,7 @@ void Enemy::move() noexcept
 
 		if (abs(heroPar) >= 30)
 			heroPar *= -1;
-		heroPar += 3;
+		heroPar += 6;
 	}
 	break;
 	case ETYPE::TWO:
@@ -603,7 +599,7 @@ void Enemy::move() noexcept
 
 		if (abs(heroPar) >= 30)
 			heroPar *= -1;
-		heroPar += 1;
+		heroPar += 5;
 	}
 	break;
 	case ETYPE::THREE:
@@ -630,7 +626,7 @@ void Enemy::move() noexcept
 
 		if (abs(heroPar) >= 45)
 			heroPar *= -1;
-		heroPar += 5;
+		heroPar += 15;
 	}
 	break;
 	case ETYPE::FOUR:
@@ -661,7 +657,7 @@ void Enemy::move() noexcept
 
 		if (abs(heroPar) == 30)
 			heroPar *= -1;
-		heroPar++;
+		heroPar += 2;
 	}
 	break;
 	default:

@@ -5,6 +5,13 @@ VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game", "Game\Game.vcxproj", "{36822C76-63F9-4256-87DE-5159A0718031}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D17BBA1B-7A8A-4740-AA7E-39A8360375AB}"
+	ProjectSection(SolutionItems) = preProject
+		Game\Levels\lvl_1.txt = Game\Levels\lvl_1.txt
+		Game\Levels\lvl_2.txt = Game\Levels\lvl_2.txt
+		Game\Levels\lvl_3.txt = Game\Levels\lvl_3.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
