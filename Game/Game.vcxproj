@@ -103,7 +103,6 @@
     <ClCompile Include="Game3D.cpp" />
     <ClCompile Include="MainGame.cpp" />
     <ClCompile Include="Player.cpp" />
-    <QtRcc Include="Game.qrc" />
     <QtUic Include="Game.ui" />
     <QtMoc Include="Game.h" />
     <ClCompile Include="Game.cpp" />

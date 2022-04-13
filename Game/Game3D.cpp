@@ -6,10 +6,7 @@ Game3D::Game3D(QGLWidget*parent)
     srand(static_cast<unsigned>(time(nullptr)));
     move(200, 200);
 
-    state = STATE::MENU;
-
     p = nullptr;
-    loadLVL("lvl_3.txt");
 
     resize(1000, 1000);
 
@@ -46,6 +43,8 @@ Game3D::Game3D(QGLWidget*parent)
 
     immunityBonusTimer = new QTimer();
     connect(immunityBonusTimer, &QTimer::timeout, this, &Game3D::immunityBonus);
+
+    setState(STATE::MENU);
 }
 
 Game3D::~Game3D()
@@ -163,9 +162,83 @@ void Game3D::mouseMoveEvent(QMouseEvent* e)
 
 void Game3D::mousePressEvent(QMouseEvent* e)
 {
-    if (e->button() == Qt::LeftButton)
+    if (state == STATE::GAME)
+        if (e->button() == Qt::LeftButton)
+            mousePos = e->pos();
+
+    if (flags.none())
+        return;
+
+    const double bWidth = width() * 0.8;
+    const double bHeigth = height() / 7.;
+    const double betweenB = bHeigth / 3.;
+
+    const double x0 = (width() - bWidth) / 2.;
+    double y0 = betweenB;
+
+    if (flags[0]) // продолжить
     {
-        mousePos = e->pos();
+        if (e->pos().x() >= x0 && e->pos().x() <= x0 + bWidth
+            && e->pos().y() >= y0 && e->pos().y() <= y0 + bHeigth)
+        {
+            setState(STATE::GAME);
+            return;
+        }
+    }
+
+    y0 += bHeigth + betweenB;
+
+    if (flags[1]) // сохранить
+    {
+        if (e->pos().x() >= x0 && e->pos().x() <= x0 + bWidth
+            && e->pos().y() >= y0 && e->pos().y() <= y0 + bHeigth)
+        {
+            saveCurrentLVLState(path);
+            setState(STATE::GAME);
+            return;
+        }
+    }
+
+    y0 += bHeigth + betweenB;
+
+    if (flags[2]) // выбор уровня
+    {
+        if (e->pos().x() >= x0 && e->pos().x() <= x0 + bWidth
+            && e->pos().y() >= y0 && e->pos().y() <= y0 + bHeigth)
+        {
+            QString path = QFileDialog::getOpenFileName();
+
+            if (path.isEmpty())
+                return;
+
+            this->path = path;
+            loadLVL(this->path);
+            return;
+        }
+    }
+
+    y0 += bHeigth + betweenB;
+
+    if (flags[3]) // рестарт
+    {
+        if (e->pos().x() >= x0 && e->pos().x() <= x0 + bWidth
+            && e->pos().y() >= y0 && e->pos().y() <= y0 + bHeigth)
+        {
+            loadLVL(path);
+            return;
+        }
+    }
+
+    y0 += bHeigth + betweenB;
+
+    if (flags[4]) // выход
+    {
+        if (e->pos().x() >= x0 && e->pos().x() <= x0 + bWidth
+            && e->pos().y() >= y0 && e->pos().y() <= y0 + bHeigth)
+        {
+            close();
+            return;
+        }
     }
 }
 
@@ -175,31 +248,9 @@ void Game3D::keyPressEvent(QKeyEvent* e)
     {
 
         if (state == STATE::GAME)
-        {
-            //buttonsPAUSE();
-            state = STATE::PAUSE; //
-            gameTimer->stop();
-            moveEnemyTimer->stop();
-            movePlayerTimer->stop();
-            addMoveTimer->stop();
-            addFastMoveTimer->stop();
-            checkCollisionTimer->stop();
-            createBonusTimer->stop();
-            setWindowTitle("PAUSE");
-        }
+            setState(STATE::PAUSE);
         else if (state == STATE::PAUSE)
-        {
-            //buttonsGAME();
-            state = STATE::GAME; //
-            gameTimer->start(gameTimerStep);
-            moveEnemyTimer->start(moveEnemyTimerStep);
-            movePlayerTimer->start(movePlayerTimerStep);
-            addMoveTimer->start(addMoveTimerStep);
-            addFastMoveTimer->start(addFastMoveTimerStep);
-            checkCollisionTimer->start(checkCollisionTimerStep);
-            createBonusTimer->start(createBonusTimerStep);
-            setWindowTitle("GAME");
-        }
+            setState(STATE::GAME);
     }
 
     if (state == STATE::GAME)
@@ -229,8 +280,8 @@ void Game3D::keyPressEvent(QKeyEvent* e)
                 glTranslatef(20, 0, 0);
 
         }
-        /*else
-            buttonsLOSE();*/
+        else
+            setState(STATE::LOSE);
 
         if (e->key() == Qt::Key_Space)
         {
@@ -244,21 +295,21 @@ void Game3D::keyPressEvent(QKeyEvent* e)
 
 void Game3D::drawGAME()
 {
+    // НУЖНА НОРМАЛЬНАЯ ЛОГИКА ДЛЯ НЕЧЁТНЫХ РАЗМЕРОВ
+
     double kx = lvl[0].size() * cellSize / 2. / static_cast<double>(width());
     double ky = lvl.size() * cellSize / 2. / static_cast<double>(height());
-    double x0 = -width() * kx; //- cellSize / 2;
-    double y0 = -height() * ky; //- cellSize / 2;
+    double x0 = -width() * kx + ((lvl[0].size() % 2)  ? cellSize / 2. : 0);
+    double y0 = -height() * ky + ((lvl.size() % 2) ? cellSize / 2. : 0);
 
     // ПОЛ
     glColor3f(222 / 255., 169 / 255., 113 / 255.);
     glPushMatrix();
     {
-        //glTranslatef(-cellSize / 2., -cellSize / 2., 0);
-        //glTranslatef(cellSize / 2., cellSize / 2., 0); // потестить этот варик
         glBegin(GL_QUADS);
         {
-            int rx = cellSize / 2 * lvl[0].size() - cellSize / 2;
-            int ry = cellSize / 2 * lvl.size() - cellSize / 2;
+            double rx = cellSize / 2. * lvl[0].size() - cellSize / 2.;
+            double ry = cellSize / 2. * lvl.size() - cellSize / 2.;
             glVertex3f(-rx, -ry, -1);
             glVertex3f(-rx, +ry, -1);
             glVertex3f(+rx, +ry, -1);
@@ -268,8 +319,11 @@ void Game3D::drawGAME()
     }
     glPopMatrix();
 
-    for (int i = -static_cast<int>((lvl[0].size() / 2)); i < static_cast<int>(lvl[0].size() / 2); ++i)
-        for (int j = -static_cast<int>((lvl.size() / 2)); j < static_cast<int>(lvl.size() / 2); ++j)
+
+    int iMax = lvl[0].size() - static_cast<int>(lvl[0].size() / 2);
+    int jMax = lvl.size() - static_cast<int>(lvl.size() / 2);
+    for (int i = -static_cast<int>((lvl[0].size() / 2)); i < iMax; ++i)
+        for (int j = -static_cast<int>((lvl.size() / 2)); j < jMax; ++j)
                 drawWall({ i + 0.5,j + 0.5,0 }, cellSize / 2., lvl[j + lvl.size() / 2][i + lvl[0].size() / 2]);
 
     p->draw({ x0,y0 }, 4);
@@ -294,22 +348,107 @@ void Game3D::drawGAME()
 
 void Game3D::drawPAUSE()
 {
-    throw std::exception("HUI");
+    begin2D();
+    {
+        drawButtons(flags);
+    }
+    end2D();
 }
 
 void Game3D::drawMENU()
 {
-    throw std::exception("HUI");
+    begin2D();
+    {
+        drawButtons(flags);
+    }
+    end2D();
 }
 
 void Game3D::drawWIN()
 {
-    throw std::exception("HUI");
+    begin2D();
+    {
+        drawButtons(flags);
+    }
+    end2D();
 }
 
 void Game3D::drawLOSE()
 {
-    throw std::exception("HUI");
+    begin2D();
+    {
+        drawButtons(flags);
+    }
+    end2D();
+}
+
+void Game3D::setState(STATE newState)
+{
+    state = newState;
+    flags.reset();
+    switch (state)
+    {
+    case Game3D::STATE::GAME:
+    {
+        gameTimer->start(gameTimerStep);
+        moveEnemyTimer->start(moveEnemyTimerStep);
+        movePlayerTimer->start(movePlayerTimerStep);
+        addMoveTimer->start(addMoveTimerStep);
+        addFastMoveTimer->start(addFastMoveTimerStep);
+        checkCollisionTimer->start(checkCollisionTimerStep);
+        createBonusTimer->start(createBonusTimerStep);
+    }
+        break;
+    case Game3D::STATE::PAUSE:
+    {
+        flags |= 0b11111;
+        gameTimer->stop();
+        moveEnemyTimer->stop();
+        movePlayerTimer->stop();
+        addMoveTimer->stop();
+        addFastMoveTimer->stop();
+        checkCollisionTimer->stop();
+        createBonusTimer->stop();
+    }
+        break;
+    case Game3D::STATE::MENU:
+    {
+        flags |= 0b10100;
+        gameTimer->stop();
+        moveEnemyTimer->stop();
+        movePlayerTimer->stop();
+        addMoveTimer->stop();
+        addFastMoveTimer->stop();
+        checkCollisionTimer->stop();
+        createBonusTimer->stop();
+    }
+        break;
+    case Game3D::STATE::WIN:
+    {
+        flags |= 0b11100;
+        gameTimer->stop();
+        moveEnemyTimer->stop();
+        movePlayerTimer->stop();
+        addMoveTimer->stop();
+        addFastMoveTimer->stop();
+        checkCollisionTimer->stop();
+        createBonusTimer->stop();
+    }
+        break;
+    case Game3D::STATE::LOSE:
+    {
+        flags |= 0b11100;
+        gameTimer->stop();
+        moveEnemyTimer->stop();
+        movePlayerTimer->stop();
+        addMoveTimer->stop();
+        addFastMoveTimer->stop();
+        checkCollisionTimer->stop();
+        createBonusTimer->stop();
+    }
+        break;
+    }
+    updateGL();
 }
 
 void Game3D::begin2D()
@@ -423,6 +562,73 @@ void Game3D::drawBars()
     glPopMatrix();
 }
 
+void Game3D::drawButtons(const std::bitset<5>& flags)
+{
+    const double bWidth = width() * 0.8;
+    const double bHeigth = height() / 7.;
+    const double betweenB = bHeigth / 3.;
+
+    const double x0 = (width() - bWidth) / 2.;
+    double y0 = betweenB;
+
+    glBegin(GL_QUADS);
+    {
+        if (flags[4]) // выход
+        {
+            glColor3f(1, 0, 0);
+            glVertex2f(x0, y0);
+            glVertex2f(x0 + bWidth, y0);
+            glVertex2f(x0 + bWidth, y0 + bHeigth);
+            glVertex2f(x0, y0 + bHeigth);
+        }
+
+        y0 += bHeigth + betweenB;
+
+        if (flags[3]) // рестарт
+        {
+            glColor3f(0, 1, 0);
+            glVertex2f(x0, y0);
+            glVertex2f(x0 + bWidth, y0);
+            glVertex2f(x0 + bWidth, y0 + bHeigth);
+            glVertex2f(x0, y0 + bHeigth);
+        }
+
+        y0 += bHeigth + betweenB;
+
+        if (flags[2]) // выбор
+        {
+            glColor3f(0, 0, 1);
+            glVertex2f(x0, y0);
+            glVertex2f(x0 + bWidth, y0);
+            glVertex2f(x0 + bWidth, y0 + bHeigth);
+            glVertex2f(x0, y0 + bHeigth);
+        }
+
+        y0 += bHeigth + betweenB;
+
+        if (flags[1]) // сохранить
+        {
+            glColor3f(1, 0, 1);
+            glVertex2f(x0, y0);
+            glVertex2f(x0 + bWidth, y0);
+            glVertex2f(x0 + bWidth, y0 + bHeigth);
+            glVertex2f(x0, y0 + bHeigth);
+        }
+
+        y0 += bHeigth + betweenB;
+
+        if (flags[0]) // продолжить
+        {
+            glColor3f(1, 1, 0);
+            glVertex2f(x0, y0);
+            glVertex2f(x0 + bWidth, y0);
+            glVertex2f(x0 + bWidth, y0 + bHeigth);
+            glVertex2f(x0, y0 + bHeigth);
+        }
+    }
+    glEnd();
+}
+
 bool Game3D::isValidCharacter(const char& c) const noexcept
 {
     constexpr char valid_characters[] = { 'x', 'g', 'p', 'd', 'b', 'U', 'D', 'C', 'Q', 'e', 'o', 's', 'v' };
@@ -475,14 +681,18 @@ void Game3D::loadLVL(QString path)
         if (tempW != "FIELD")
             throw std::exception("Did not find field \'FIELD\'!");
 
+        for (auto&& cl : lvl)
+            cl.clear();
         lvl.clear();
+        for (auto&& clm : lvlMovable)
+            clm.clear();
         lvlMovable.clear();
         for (auto&& l : diamonds)
         {
-            l.clear();
             for (auto&& d : l)
                 if (d)
                     delete d;
+            l.clear();
         }
         diamonds.clear();
 
@@ -612,12 +822,9 @@ void Game3D::loadLVL(QString path)
             (isNew ? maxhp : hp), maxhp);
 
         for (auto&& bonus : bonuses) if (bonus) delete bonus;
+        bonuses.clear();
 
-        //buttonsGAME();
-
-        // test
-        state = STATE::GAME;
-        updateGL();
+        setState(STATE::GAME);
 
         INfile.close();
     }
@@ -633,7 +840,7 @@ void Game3D::loadLVL(QString path)
 
 void Game3D::saveCurrentLVLState(QString path)
 {
-    std::ofstream OUTfile((path.left(path.size() - 5) + "_current.txt").toStdString());
+    std::ofstream OUTfile((path.left(path.size() - 4) + "_current.txt").toStdString());
 
     if (!OUTfile)
     {
@@ -807,25 +1014,14 @@ void Game3D::gameStep()
 
     gameTime -= 1;
     if (gameTime <= 0)
-    {
-        state = STATE::LOSE;
-        //buttonsLOSE();
-        updateGL();
-    }
+        setState(STATE::LOSE);
 
     currentMoney = 0;
     for (auto&& line : lvl)
         currentMoney += std::count(line.begin(), line.end(), 'o');
 
     if (!currentMoney)
-    {
-        //buttonsWIN();
-
-        state = STATE::WIN;// 
-
-        // test
-        setWindowTitle("YOU WON!");
-    }
+        setState(STATE::WIN);
 }
 
 void Game3D::movePlayer()
@@ -902,10 +1098,7 @@ void Game3D::checkCollision()
         {
             p->DownHP();
             if (!*p)
-            {
-                state = STATE::LOSE; //
-                //buttonsLOSE();
-            }
+                setState(STATE::LOSE);
         }
 }
 

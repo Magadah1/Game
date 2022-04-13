@@ -7,6 +7,7 @@ class Player :
 {
 public:
 	Player(QPoint pos, int cellSize, int health = 3, int maxHealth = 3) noexcept;
+	~Player();
 
 	int getHP() const noexcept;
 	int getMaxHP() const noexcept;

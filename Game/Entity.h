@@ -57,7 +57,7 @@ protected:
 
 	QPoint nextPos;
 
-	mutable GLuint textures;
+	GLuint textures;
 
 	AUX_RGBImageRec* photo_image;
 };

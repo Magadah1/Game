@@ -5,7 +5,15 @@ Player::Player(QPoint pos, int cellSize, int health, int maxHealth) noexcept
 {
     glGenTextures(1, &textures);
     photo_image = auxDIBImageLoad(L"Hero.bmp");
-    
+}
+
+Player::~Player()
+{
+    if (photo_image)
+    {
+        delete photo_image->data;
+        delete photo_image;
+    }
 }
 
 int Player::getHP() const noexcept

@@ -15,6 +15,7 @@ public:
 	} ETYPE;
 
 	Enemy(QPoint pos, int cellSize, ETYPE type = ETYPE::ONE) noexcept;
+	~Enemy();
 
 	ETYPE getType() const noexcept;
 

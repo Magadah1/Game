@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <fstream>
 #include <string>
+#include <bitset>
 
 class Game3D : public QGLWidget
 {
@@ -91,10 +92,14 @@ private:
 	void drawWIN();
 	void drawLOSE();
 
+	void setState(STATE newState);
+
 	void begin2D();
 	void end2D();
 
 	void drawBars();
+	void drawButtons(const std::bitset<5>& flags);
+	std::bitset<5> flags; // cont, save, select, restart, exit
 
 	int gameTime;
 	int startMoney;

@@ -7,6 +7,15 @@ Enemy::Enemy(QPoint pos, int cellSize, ETYPE type) noexcept
 	photo_image = auxDIBImageLoad(L"Z.bmp");
 }
 
+Enemy::~Enemy()
+{
+	if (photo_image)
+	{
+		delete photo_image->data;
+		delete photo_image;
+	}
+}
+
 Enemy::ETYPE Enemy::getType() const noexcept
 {
 	return type;
@@ -41,8 +50,12 @@ bool Enemy::addMove(const std::vector<std::vector<bool>>& lvl, std::pair<int, in
 				map[i][j] = (type == ETYPE::TWO) ? -1 : (lvl[i][j] ? -1 : 9999);
 
 		if (type == ETYPE::TWO)
+		{
 			for (size_t i = 0; i < map[0].size(); ++i)
-				map[0][i] = map[map.size() - 1][i] = map[i][0] = map[i][map[0].size() - 1] = 9999;
+				map[0][i] = map[map.size() - 1][i] = 9999;
+			for (size_t j = 0; j < map.size(); ++j)
+				map[j][0] = map[j][map[0].size() - 1] = 9999;
+		}
 
 		int row = map.size();
 		int col = map[0].size();
@@ -278,7 +291,7 @@ void Enemy::draw(std::pair<double, double> t0, double l) const noexcept
 				break;
 			}
 			
-			glTranslated(0, 0, 35 * l);
+			glTranslated(0, 0, 36 * l);
 			glColor3f(26 / 255.0, 26 / 255.0, 26 / 255.0);
 			Draw_Parallepiped(0, 0, 0, 8 * l, 5 * l, 16 * l, 10, 10); // Туловище
 			// Голова
