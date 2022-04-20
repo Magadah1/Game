@@ -101,11 +101,8 @@
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Game3D.cpp" />
-    <ClCompile Include="MainGame.cpp" />
     <ClCompile Include="Player.cpp" />
     <QtUic Include="Game.ui" />
-    <QtMoc Include="Game.h" />
-    <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <QtUic Include="MainGame.ui" />
   </ItemGroup>
@@ -114,7 +111,6 @@
     <ClInclude Include="Diamond.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Entity.h" />
-    <QtMoc Include="MainGame.h" />
     <QtMoc Include="Game3D.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>

@@ -1,5 +1,5 @@
 NEW 1
-TIME 65
+TIME 150
 SIZE 31 28
 FIELD
 gxxxxxxxxxxxxxxxxxxxxxxxxxxp

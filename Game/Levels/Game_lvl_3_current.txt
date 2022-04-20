@@ -1,5 +1,5 @@
-NEW 1
-TIME 65
+NEW 0
+TIME 150
 SIZE 31 28
 FIELD
 gxxxxxxxxxxxxxxxxxxxxxxxxxxp
@@ -34,9 +34,15 @@ xodxxxxxxxxbodbodxxxxxxxxbox
 xeooooooooooooooooooooooooex
 dxxxxxxxxxxxxxxxxxxxxxxxxxxb
 PLAYER
+HP 20
 MAXHP 20
+POS 13 16
 ENEMIES 4
 TYPE 4
+POS 2 29
 TYPE 3
+POS 26 29
 TYPE 2
+POS 1 2
 TYPE 1
+POS 26 1

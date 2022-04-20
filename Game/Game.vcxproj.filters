@@ -26,12 +26,6 @@
     <QtUic Include="Game.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtMoc Include="Game.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <ClCompile Include="Game.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -44,9 +38,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Entity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MainGame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Bonus.cpp">
@@ -77,9 +68,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="MainGame.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="Game3D.h">
       <Filter>Header Files</Filter>
     </QtMoc>

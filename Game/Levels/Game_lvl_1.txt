@@ -1,0 +1,11 @@
+NEW 1
+TIME 65
+SIZE 4 4
+FIELD
+gxxp
+xsox
+xovx
+dxxb
+PLAYER
+MAXHP 1
+ENEMIES 0

@@ -1,0 +1,14 @@
+NEW 1
+TIME 100
+SIZE 6 6
+FIELD
+gxxxxp
+xsovox
+xovovx
+xvovox
+xovoex
+dxxxxb
+PLAYER
+MAXHP 1
+ENEMIES 1
+TYPE 1

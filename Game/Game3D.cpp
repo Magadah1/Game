@@ -4,11 +4,13 @@ Game3D::Game3D(QGLWidget*parent)
 	: QGLWidget(parent)
 {
     srand(static_cast<unsigned>(time(nullptr)));
-    move(200, 200);
+
+    setWindowIcon(QIcon("IcoG.ico"));
 
     p = nullptr;
 
-    resize(1000, 1000);
+    setMinimumSize(1000, 1000);
+    showMaximized();
 
     gameTimer = new QTimer();
     gameTimer->start(gameTimerStep);
@@ -60,6 +62,8 @@ Game3D::Game3D(QGLWidget*parent)
     glGenTextures(1, &texL);
 
     isNew = false;
+
+    newGame = NewGame::SELECTION;
 
     fun = false;
 
@@ -214,6 +218,13 @@ void Game3D::mousePressEvent(QMouseEvent* e)
         if (e->pos().x() >= x - r / 2. && e->pos().x() <= x + r / 2. &&
             e->pos().y() >= y - r / 2. && e->pos().y() <= y + r / 2.)
         {
+            if (newGame == NewGame::SELECTION)
+            {
+                newGame = NewGame::LVL1;
+                path = "Levels\\Game_lvl_1.txt";
+                loadLVL(path);
+                return;
+            }
             setState(STATE::GAME);
             return;
         }
@@ -237,6 +248,8 @@ void Game3D::mousePressEvent(QMouseEvent* e)
 
             if (path.isEmpty())
                 return;
+
+            newGame = NewGame::NONE;
 
             this->path = path;
             loadLVL(this->path);
@@ -330,6 +343,19 @@ void Game3D::keyPressEvent(QKeyEvent* e)
         fun = !fun;
         updateGL();
     }
+
+    static bool full = false;
+    if (e->key() == Qt::Key_F11)
+        if (full)
+        {
+            showMaximized();
+            full = false;
+        }
+        else
+        {
+            showFullScreen();
+            full = true;
+        }
 }
 
 void Game3D::drawGAME()
@@ -362,6 +388,15 @@ void Game3D::drawGAME()
     for (int i = -static_cast<int>((lvl[0].size() / 2)); i < iMax; ++i)
         for (int j = -static_cast<int>((lvl.size() / 2)); j < jMax; ++j)
                 drawWall({ i + 0.5,j + 0.5,0 }, cellSize / 2., lvl[j + lvl.size() / 2][i + lvl[0].size() / 2]);
+
+    /*int iMax = lvl[0].size() - static_cast<int>(lvl[0].size() / 2);
+    int jMax = lvl.size() - static_cast<int>(lvl.size() / 2);
+    int fff = -static_cast<int>((lvl[0].size() / 2));
+    int ddd = -static_cast<int>((lvl.size() / 2));
+    int i, j;
+    for (i = -static_cast<int>((lvl[0].size() / 2)); i < (static_cast<int>(lvl[0].size()) - static_cast<int>(lvl[0].size() / 2)); ++i)
+        for (j = -static_cast<int>((lvl.size() / 2)); j < static_cast<int>(lvl.size()) - static_cast<int>(lvl.size() / 2); ++j)
+            drawWall({ i + 0.5,j + 0.5,0 }, cellSize / 2., lvl[j + lvl.size() / 2][i + lvl[0].size() / 2]);*/
 
     p->draw({ x0,y0 }, 4);
 
@@ -403,6 +438,22 @@ void Game3D::drawMENU()
 
 void Game3D::drawWIN()
 {
+    if (newGame == NewGame::LVL1)
+    {
+        newGame = NewGame::LVL2;
+        path = "Levels\\Game_lvl_2.txt";
+        loadLVL(path);
+    }
+    else if (newGame == NewGame::LVL2)
+    {
+        newGame = NewGame::LVL3;
+        path = "Levels\\Game_lvl_3.txt";
+        loadLVL(path);
+    }
+    else if (newGame == NewGame::LVL3)
+        newGame = NewGame::NONE;
+
+
     begin2D();
     {
         drawButtons(flags);
@@ -516,7 +567,7 @@ void Game3D::setState(STATE newState)
         break;
     case Game3D::STATE::MENU:
     {
-        flags |= 0b10100;
+        flags |= 0b10101;
         gameTimer->stop();
         moveEnemyTimer->stop();
         movePlayerTimer->stop();
@@ -581,8 +632,8 @@ void Game3D::drawBars()
     {
         { // полоска хп
             const double h = p->getHP() / static_cast<double>(p->getMaxHP());
-            constexpr double hpLength = 200;
-            constexpr double hpHeight = 65;
+            const double hpLength = width() / 3.;
+            const double hpHeight = height() / 9.;
 
             glColor3f(1 - h, h, 0);
             glBegin(GL_QUADS);
@@ -610,8 +661,8 @@ void Game3D::drawBars()
 
         { // прогресс в сборе @монеток@
             const double m = (startMoney - currentMoney) / static_cast<double>(startMoney);
-            constexpr double moneyLength = 200;
-            constexpr double moneyHeight = 65;
+            const double moneyLength = width() / 3.;
+            const double moneyHeight = height() / 9.;
 
             glColor3f(1 - m, m, 1 - m);
             glBegin(GL_QUADS);
@@ -636,31 +687,76 @@ void Game3D::drawBars()
             glLineWidth(1);
         }
 
-        // если меньше 45 секунд осталось, то рисуем предупреждение!
-        if (gameTime <= 45)
+        // если меньше 60 секунд осталось, то часы двигаются
+        glColor3f(1, 1, 1);
+        const double x0 = width() / 2., y0 = height() / 18.;
+        const double& r = y0;
+        const double _2pi = 2 * acos(-1);
+        glBegin(GL_TRIANGLE_FAN);
         {
-            constexpr double triangleLength = 70;
-            constexpr double triangleHeight = 100;
-            glColor3f(229 / 255., 190 / 255., 1 / 255.);
-            glBegin(GL_TRIANGLES);
+            
+            glVertex2f(x0, y0);
+            for (size_t i = 0; i <= 60 && i <= gameTime; ++i)
             {
-                glVertex2f(width() / 2., triangleHeight + 15);
-                glVertex2f(width() / 2. - triangleLength, 15);
-                glVertex2f(width() / 2. + triangleLength, 15);
+                double x = x0 + r * cos(i * _2pi / 60. + _2pi / 4.);
+                double y = y0 + r * sin(i * _2pi / 60. + _2pi / 4.);
+                glVertex2f(x, y);
             }
-            glEnd();
 
-            glColor3f(1, 1, 1);
-            glLineWidth(3);
-            glBegin(GL_LINE_LOOP);
-            {
-                glVertex2f(width() / 2., triangleHeight + 15);
-                glVertex2f(width() / 2. - triangleLength, 15);
-                glVertex2f(width() / 2. + triangleLength, 15);
-            }
-            glEnd();
-            glLineWidth(1);
         }
+        glEnd();
+        
+
+        // рисуем номер уровня, если выбран режим готовой игры, иначе ничего
+        const double h = 2 * r / 3.;
+        const double w = r / 6.;
+        glBegin(GL_QUADS);
+        {
+            if (newGame == NewGame::LVL1)
+            {
+                glColor3f(0, 0.3, 1);
+
+                glVertex2f(x0 - w, y0 - h);
+                glVertex2f(x0 + w, y0 - h);
+                glVertex2f(x0 + w, y0 + h);
+                glVertex2f(x0 - w, y0 + h);
+            }
+            else if (newGame == NewGame::LVL2)
+            {
+                glColor3f(0.3, 0.7, 0.4);
+
+                glVertex2f(x0 - w - 1.2 * w, y0 - h);
+                glVertex2f(x0 + w - 1.2 * w, y0 - h);
+                glVertex2f(x0 + w - 1.2 * w, y0 + h);
+                glVertex2f(x0 - w - 1.2 * w, y0 + h);
+
+                glVertex2f(x0 - w + 1.2 * w, y0 - h);
+                glVertex2f(x0 + w + 1.2 * w, y0 - h);
+                glVertex2f(x0 + w + 1.2 * w, y0 + h);
+                glVertex2f(x0 - w + 1.2 * w, y0 + h);
+            }
+            else if (newGame == NewGame::LVL3)
+            {
+                glColor3f(0.9, 0.8, 0.6);
+
+                glVertex2f(x0 - w - 2.2 * w, y0 - h);
+                glVertex2f(x0 + w - 2.2 * w, y0 - h);
+                glVertex2f(x0 + w - 2.2 * w, y0 + h);
+                glVertex2f(x0 - w - 2.2 * w, y0 + h);
+
+                glVertex2f(x0 - w, y0 - h);
+                glVertex2f(x0 + w, y0 - h);
+                glVertex2f(x0 + w, y0 + h);
+                glVertex2f(x0 - w, y0 + h);
+
+                glVertex2f(x0 - w + 2.2 * w, y0 - h);
+                glVertex2f(x0 + w + 2.2 * w, y0 - h);
+                glVertex2f(x0 + w + 2.2 * w, y0 + h);
+                glVertex2f(x0 - w + 2.2 * w, y0 + h);
+            }
+        }
+        glEnd();
+   
     }
     glPopMatrix();
 }
@@ -693,7 +789,10 @@ void Game3D::drawButtons(const std::bitset<5>& flags)
 
     if (flags[0]) // продолжить
     {
-        glColor3f(0, 0.7, 0);
+        if (newGame == NewGame::SELECTION)
+            glColor3f(1, 160. / 255, 0);
+        else
+            glColor3f(0, 0.7, 0);
         drawCircle(center, r, 0, 40);
 
         glColor3f(0.9, 0.9, 0.9);
@@ -1065,6 +1164,8 @@ void Game3D::loadLVL(QString path)
         for (auto&& bonus : bonuses) if (bonus) delete bonus;
         bonuses.clear();
 
+        glLoadIdentity();
+        glRotatef(-60, 1, 0, 0);
         setState(STATE::GAME);
 
         INfile.close();

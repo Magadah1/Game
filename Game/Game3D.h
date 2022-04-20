@@ -124,6 +124,15 @@ private:
 	void saveCurrentLVLState(QString path);
 	QString path;
 	bool isNew;
+	
+	enum class NewGame
+	{
+		NONE,		// загружен другой уровень
+		SELECTION,	// стадия меню, самое начало
+		LVL1,
+		LVL2,
+		LVL3
+	} newGame;
 
 	void drawWall(std::tuple<float, float, float> point, double r, char c, double coefH = 1);
 

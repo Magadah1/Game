@@ -19,7 +19,7 @@ dxxxxxxxxxxxxxxxxxxxxxxxxxxb
 PLAYER
 MAXHP 4
 ENEMIES 4
-TYPE 1
-TYPE 1
+TYPE 4
+TYPE 2
 TYPE 1
 TYPE 1
