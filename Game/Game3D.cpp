@@ -49,11 +49,12 @@ Game3D::Game3D(QGLWidget*parent)
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
+    eT = auxDIBImageLoad(L"Andry.bmp");
+    glGenTextures(1, &texE);
+
     pT = auxDIBImageLoad(L"Hero.bmp");
     glGenTextures(1, &texP);
-
-    eT = auxDIBImageLoad(L"Z.bmp");
-    glGenTextures(1, &texE);
+    
 
     wT = auxDIBImageLoad(L"WinFun.bmp");
     glGenTextures(1, &texW);
@@ -65,7 +66,7 @@ Game3D::Game3D(QGLWidget*parent)
 
     newGame = NewGame::SELECTION;
 
-    fun = false;
+    fun = true;
 
     setState(STATE::MENU);
 }
@@ -109,9 +110,11 @@ void Game3D::initializeGL()
 	glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
     glEnable(GL_LIGHT0);
-    float GL_LIGHT0_CORD[] = { 0,0,700, 1 };
+    float GL_LIGHT0_CORD[] = { 0,0,500, 1 };
     glLightfv(GL_LIGHT0, GL_POSITION, GL_LIGHT0_CORD);
-    //float GL_LIGHT0_DIR[] = {}
+    float GL_LIGHT0_MAX[] = { 0.5,0.5,0.5 };
+    glLightfv(GL_LIGHT0, GL_AMBIENT, GL_LIGHT0_MAX);
+    //float GL_LIGHT0_DIR[] = {} 
 
 
 
@@ -132,7 +135,7 @@ void Game3D::resizeGL(int w, int h)
     glMatrixMode(GL_PROJECTION);
     glViewport(0, 0, width(), height());
     glLoadIdentity();
-    static const int magic = 2 * (sqrt(w * w + h * h) + 1);
+    const int magic = 2 * (sqrt(w * w + h * h) + 1);
     glOrtho(-w, w, -h, h, -magic, magic);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -328,12 +331,14 @@ void Game3D::keyPressEvent(QKeyEvent* e)
         if (e->key() == Qt::Key_L)
             if (light)
             {
+                //glDisable(GL_LIGHTING);
                 glDisable(GL_LIGHT0);
                 light = false;
             }
             else
             {
                 glEnable(GL_LIGHT0);
+                //glEnable(GL_LIGHTING);
                 light = true;
             }
     }
@@ -362,7 +367,7 @@ void Game3D::drawGAME()
 {
     double kx = lvl[0].size() * cellSize / 2. / static_cast<double>(width());
     double ky = lvl.size() * cellSize / 2. / static_cast<double>(height());
-    double x0 = -width() * kx + ((lvl[0].size() % 2)  ? cellSize / 2. : 0);
+    double x0 = -width() * kx + ((lvl[0].size() % 2) ? cellSize / 2. : 0);
     double y0 = -height() * ky + ((lvl.size() % 2) ? cellSize / 2. : 0);
 
     // онк
@@ -387,7 +392,7 @@ void Game3D::drawGAME()
     int jMax = lvl.size() - static_cast<int>(lvl.size() / 2);
     for (int i = -static_cast<int>((lvl[0].size() / 2)); i < iMax; ++i)
         for (int j = -static_cast<int>((lvl.size() / 2)); j < jMax; ++j)
-                drawWall({ i + 0.5,j + 0.5,0 }, cellSize / 2., lvl[j + lvl.size() / 2][i + lvl[0].size() / 2]);
+            drawWall({ i + 0.5,j + 0.5,0 }, cellSize / 2., lvl[j + lvl.size() / 2][i + lvl[0].size() / 2]);
 
     /*int iMax = lvl[0].size() - static_cast<int>(lvl[0].size() / 2);
     int jMax = lvl.size() - static_cast<int>(lvl.size() / 2);
@@ -417,7 +422,6 @@ void Game3D::drawGAME()
     }
     end2D();
 }
-
 void Game3D::drawPAUSE()
 {
     begin2D();
@@ -1167,6 +1171,16 @@ void Game3D::loadLVL(QString path)
         glLoadIdentity();
         glRotatef(-60, 1, 0, 0);
         setState(STATE::GAME);
+
+        if (w <= 27)
+        {
+            const int ww = lvl[0].size() * cellSize;
+            const int hh = lvl.size() * cellSize;
+
+            const int maxR = std::max(ww, hh);
+            const double scale = width() * 0.95 / maxR;
+            glScalef(scale, scale, scale);
+        }
 
         INfile.close();
     }
